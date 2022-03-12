@@ -9,7 +9,7 @@ import React from "react";
 import toast from "react-hot-toast";
 import styled from "styled-components";
 import useFirebaseUser from "../../hooks/useFirebaseUser";
-import ValidatabaleValue from "./ValidatableValue";
+import ValidatabaleValue from "../../lib/ValidatableValue";
 
 interface Props
 {
