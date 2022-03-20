@@ -1,11 +1,26 @@
+import { getAuth, signOut } from "firebase/auth"
 import type { NextPage } from 'next'
 import Head from 'next/head'
-import Link from "next/link"
+import { useRouter } from "next/router"
 import AuthCheck from "../components/AuthCheck"
+import useFirebaseUser from "../hooks/useFirebaseUser"
 import styles from '../styles/Home.module.css'
 
 const Home: NextPage = () =>
 {
+    const router = useRouter();
+    const user = useFirebaseUser();
+
+    const login = async () =>
+    {
+        await router.push( "/auth/login" )
+    }
+
+    const logout = async () =>
+    {
+        await signOut( getAuth() );
+    }
+
     return (
         <div className={styles.container}>
             <Head>
@@ -15,15 +30,13 @@ const Home: NextPage = () =>
             </Head>
 
             <main className={styles.main}>
-                <p>{"Hello, im peperino"}</p>
+                <p>{`Hello ${user?.email ?? ""}, im peperino`}</p>
 
-                <Link href={"/login"}>
-                    <button>
-                        <AuthCheck fallback={<>Einloggen</>}>
-                            <>Ausloggen</>
-                        </AuthCheck>
-                    </button>
-                </Link>
+                <AuthCheck fallback={
+                    <button onClick={login}>Einloggen</button>
+                }>
+                    <button onClick={logout}>Ausloggen</button>
+                </AuthCheck>
             </main>
         </div>
     )

@@ -1,5 +1,5 @@
 import { getApps, initializeApp } from 'firebase/app';
-import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { getAuth, onAuthStateChanged, onIdTokenChanged, User } from "firebase/auth";
 import cookie from "js-cookie";
 import { AUTH_TOKEN_COOKIE_NAME } from "../shared/constants";
 
@@ -19,18 +19,26 @@ if ( getApps().length === 0 )
     initializeApp( firebaseConfig );
 }
 
-
-
 onAuthStateChanged( getAuth(), async ( user ) =>
+{
+    await setTokenForUser( user );
+} );
+
+onIdTokenChanged( getAuth(), async ( user ) =>
+{
+    await setTokenForUser( user );
+} );
+
+async function setTokenForUser( user: User | null )
 {
     if ( user )
     {
         const token = await user?.getIdToken();
-        console.log( token );
         cookie.set( AUTH_TOKEN_COOKIE_NAME, token, { expires: 1 } );
     }
+
     else
     {
         cookie.remove( AUTH_TOKEN_COOKIE_NAME );
     }
-} );
+}
