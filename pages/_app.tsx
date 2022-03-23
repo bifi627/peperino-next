@@ -2,7 +2,6 @@ import { AppShell, ScrollArea } from '@mantine/core';
 import { NotificationsProvider } from '@mantine/notifications';
 import type { AppProps } from 'next/app';
 import React from "react";
-import { Toaster } from "react-hot-toast";
 import Header from "../components/Header/Header";
 import Navbar from "../components/Navbar/Navbar";
 import "../lib/firebase";
@@ -25,7 +24,6 @@ export function MyApp( { Component, pageProps }: AppProps )
                 <ScrollArea>
                     <Component {...pageProps} />
                 </ScrollArea>
-                <Toaster />
             </AppShell >
         </NotificationsProvider >
     );

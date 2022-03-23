@@ -1,5 +1,6 @@
 import { useRouter } from "next/router";
 import styled from "styled-components";
+import { KnownRoutes } from "../../../lib/routing";
 
 interface Props
 {
@@ -27,7 +28,7 @@ export default ( props: Props ) =>
 
     const onLogoClick = () =>
     {
-        router.push( "/" )
+        router.push( KnownRoutes.Root() )
     }
 
     return (

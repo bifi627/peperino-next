@@ -1,7 +1,7 @@
 import { getAuth, User } from "firebase/auth";
 import { useEffect, useState } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
-import { User as PeperinoUser } from "../models/user";
+import { User as PeperinoUser } from "../interfaces/user";
 import UserService from "../services/userService";
 
 interface UserState

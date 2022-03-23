@@ -1,6 +1,7 @@
 import { MediaQuery, Navbar, ScrollArea, Text } from "@mantine/core";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { KnownRoutes } from "../../lib/routing";
 import Logo from "../Header/components/Logo";
 
 interface Props
@@ -22,12 +23,12 @@ export default ( { opened }: Props ) =>
             </MediaQuery>
             <Navbar.Section grow component={ScrollArea} mx="-xs" px="xs">
                 <Navbar.Section mt="xs">{
-                    <Link href="/demo" passHref>
+                    <Link href={KnownRoutes.Demo()} passHref>
                         <Text>Demo</Text>
                     </Link>
                 }</Navbar.Section>
                 <Navbar.Section mt="xs">{
-                    <Link href="/secret" passHref>
+                    <Link href={KnownRoutes.Secret()} passHref>
                         <Text>Secret</Text>
                     </Link>
                 }</Navbar.Section>

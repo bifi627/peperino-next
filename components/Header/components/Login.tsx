@@ -1,6 +1,7 @@
 import { Text } from "@mantine/core";
 import { useRouter } from "next/router";
 import styled from "styled-components";
+import { KnownRoutes } from "../../../lib/routing";
 
 interface Props
 {
@@ -28,7 +29,7 @@ export default ( props: Props ) =>
 
     const onLoginClick = () =>
     {
-        router.push( "auth" );
+        router.push( KnownRoutes.Login() );
     }
     return (
         <ProfileBox onClick={onLoginClick}>

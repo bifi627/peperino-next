@@ -1,7 +1,6 @@
 import Link from "next/link";
 import useFirebaseUser from "../hooks/useUser";
-
-type AuthCheckDirection = "Login" | "Logout";
+import { KnownRoutes } from "../lib/routing";
 
 interface Props
 {
@@ -29,5 +28,5 @@ export default ( props: Props ): JSX.Element =>
         return <></>;
     }
 
-    return <Link href="/login">You must be signed in</Link>;
+    return <Link href={KnownRoutes.Login()}>You must be signed in</Link>;
 }
