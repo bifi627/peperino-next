@@ -7,9 +7,10 @@ import Logo from "../Header/components/Logo";
 interface Props
 {
     opened: boolean;
+    setOpened: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-export default ( { opened }: Props ) =>
+export default ( { opened, setOpened }: Props ) =>
 {
     const router = useRouter();
 
@@ -17,19 +18,32 @@ export default ( { opened }: Props ) =>
         <Navbar hidden={!opened} hiddenBreakpoint="sm" p="xs" width={{ base: 300 }}>
             <MediaQuery largerThan={"sm"} styles={{ display: 'none' }}>
                 <div>
-                    <Logo></Logo>
+                    <Link href={KnownRoutes.Root()} passHref>
+                        <a onClick={() =>
+                        {
+                            setOpened( false );
+                        }}>
+                            <Logo></Logo>
+                        </a>
+                    </Link>
                     <hr></hr>
                 </div>
             </MediaQuery>
             <Navbar.Section grow component={ScrollArea} mx="-xs" px="xs">
                 <Navbar.Section mt="xs">{
                     <Link href={KnownRoutes.Demo()} passHref>
-                        <Text>Demo</Text>
+                        <Text onClick={() =>
+                        {
+                            setOpened( false );
+                        }} component="a">Demo</Text>
                     </Link>
                 }</Navbar.Section>
                 <Navbar.Section mt="xs">{
                     <Link href={KnownRoutes.Secret()} passHref>
-                        <Text>Secret</Text>
+                        <Text onClick={() =>
+                        {
+                            setOpened( false );
+                        }} component="a">Secret</Text>
                     </Link>
                 }</Navbar.Section>
             </Navbar.Section>

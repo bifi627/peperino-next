@@ -1,7 +1,5 @@
 import { Text } from "@mantine/core";
-import { useRouter } from "next/router";
 import styled from "styled-components";
-import { KnownRoutes } from "../../../lib/routing";
 
 interface Props
 {
@@ -25,14 +23,8 @@ const ProfileBox = styled.div`
 
 export default ( props: Props ) =>
 {
-    const router = useRouter();
-
-    const onLoginClick = () =>
-    {
-        router.push( KnownRoutes.Login() );
-    }
     return (
-        <ProfileBox onClick={onLoginClick}>
+        <ProfileBox>
             <ProfilePicture url={"https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png"}></ProfilePicture>
             <Text>Einloggen</Text>
         </ProfileBox>

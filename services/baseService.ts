@@ -28,7 +28,7 @@ export class BaseService
 
         const url = path !== "" ? `${this.getRoute()}/${path}` : this.getRoute();
 
-        console.log( "[POST] " + url );
+        console.table( { url: url, body: body } );
 
         const response = await fetch( url, request );
         return this.handleResponse<OUT>( response );
@@ -40,7 +40,7 @@ export class BaseService
 
         const url = path !== "" ? `${this.getRoute()}/${path}` : this.getRoute();
 
-        console.table( { url: url } );
+        console.log( "[GET] " + url );
 
         const response = await fetch( url, request );
         return this.handleResponse<OUT>( response );

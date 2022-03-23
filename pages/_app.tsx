@@ -15,7 +15,7 @@ export function MyApp( { Component, pageProps }: AppProps )
                 navbarOffsetBreakpoint="sm"
                 fixed
                 padding="md"
-                navbar={< Navbar opened={opened} ></Navbar >}
+                navbar={< Navbar opened={opened} setOpened={setOpened} ></Navbar >}
                 header={< Header opened={opened} setOpened={setOpened} ></Header >}
                 styles={( theme ) => ( {
                     main: { backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[ 8 ] : theme.colors.gray[ 0 ] }

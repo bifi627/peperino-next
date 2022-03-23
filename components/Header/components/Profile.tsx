@@ -1,9 +1,6 @@
 import { Text } from "@mantine/core";
-import { useRouter } from "next/router";
-import { useLayoutEffect, useRef } from "react";
 import styled from "styled-components";
 import useUser from "../../../hooks/useUser";
-import { KnownRoutes } from "../../../lib/routing";
 
 interface Props
 {
@@ -27,37 +24,10 @@ const ProfileBox = styled.div`
 export default ( props: Props ) =>
 {
     const user = useUser();
-    const router = useRouter();
-
-    const onProfileClick = () =>
-    {
-        if ( user && user.peperinoUser?.username )
-        {
-            router.push( KnownRoutes.Profile( user.peperinoUser.username ) );
-        }
-    }
-
-    const ref = useRef<HTMLImageElement>( null );
-
-    useLayoutEffect( () =>
-    {
-        if ( ref.current )
-        {
-            if ( user && user.firebaseUser.photoURL )
-            {
-                ref.current.src = user.firebaseUser.photoURL;
-            }
-            else
-            {
-                ref.current.referrerPolicy = "no-referrer";
-                ref.current.src = "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png"
-            }
-        }
-    }, [ ref, user ] );
 
     return (
-        <ProfileBox onClick={onProfileClick}>
-            <ProfilePicture ref={ref}></ProfilePicture>
+        <ProfileBox>
+            <ProfilePicture referrerPolicy="no-referrer" src={user?.firebaseUser?.photoURL ? user.firebaseUser.photoURL : "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png"}></ProfilePicture>
             <Text>{user?.firebaseUser.email}</Text>
         </ProfileBox>
     );

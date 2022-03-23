@@ -1,6 +1,4 @@
-import { useRouter } from "next/router";
 import styled from "styled-components";
-import { KnownRoutes } from "../../../lib/routing";
 
 interface Props
 {
@@ -24,15 +22,8 @@ const LogoBox = styled.div`
 
 export default ( props: Props ) =>
 {
-    const router = useRouter();
-
-    const onLogoClick = () =>
-    {
-        router.push( KnownRoutes.Root() )
-    }
-
     return (
-        <LogoBox onClick={onLogoClick}>
+        <LogoBox>
             <LogoPicture url={"https://upload.wikimedia.org/wikipedia/commons/7/78/Hk_P-plate.svg"}></LogoPicture>
             <span>Peperino</span>
         </LogoBox>

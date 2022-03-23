@@ -1,5 +1,8 @@
 import { Burger, Header, MediaQuery } from "@mantine/core";
+import Link from "next/link";
 import styled from "styled-components";
+import useUser from "../../hooks/useUser";
+import { KnownRoutes } from "../../lib/routing";
 import AuthCheck from "../AuthCheck";
 import Login from "./components/Login";
 import Logo from "./components/Logo";
@@ -19,6 +22,8 @@ const HeaderBox = styled.div`
 
 export default ( { opened, setOpened }: Props ) =>
 {
+    const user = useUser();
+
     return (
         <Header height={60} p="md">{
             <HeaderBox>
@@ -32,11 +37,26 @@ export default ( { opened, setOpened }: Props ) =>
                 </MediaQuery>
                 <MediaQuery smallerThan={"sm"} styles={{ display: 'none' }}>
                     <div>
-                        <Logo></Logo>
+                        <Link href={KnownRoutes.Root()}>
+                            <a>
+                                <Logo />
+                            </a>
+                        </Link>
                     </div>
                 </MediaQuery>
-                <AuthCheck fallback={<Login></Login>}>
-                    <Profile></Profile>
+                <AuthCheck fallback=
+                    {
+                        <Link href={KnownRoutes.Login()}>
+                            <a>
+                                <Login />
+                            </a>
+                        </Link>
+                    }>
+                    <Link href={KnownRoutes.Profile( user?.peperinoUser?.username ?? "" )}>
+                        <a>
+                            <Profile />
+                        </a>
+                    </Link>
                 </AuthCheck>
             </HeaderBox>
         }</Header>
