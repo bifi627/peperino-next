@@ -1,5 +1,5 @@
 import Link from "next/link";
-import useFirebaseUser from "../hooks/useFirebaseUser";
+import useFirebaseUser from "../hooks/useUser";
 
 type AuthCheckDirection = "Login" | "Logout";
 

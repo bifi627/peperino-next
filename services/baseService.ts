@@ -22,18 +22,6 @@ export class BaseService
         return ApiHelper.getEndpointRoute( this.endpoint );
     }
 
-    protected async get<IN, OUT>( path?: string, body?: IN )
-    {
-        const request = this.createRequestOptions( "GET", JSON.stringify( body ) );
-
-        const url = path !== "" ? `${this.getRoute()}/${path}` : this.getRoute();
-
-        console.table( { url: url, param: body } );
-
-        const response = await fetch( url, request );
-        return this.handleResponse<OUT>( response );
-    }
-
     protected async post<IN, OUT>( path?: string, body?: IN )
     {
         const request = this.createRequestOptions( "POST", JSON.stringify( body ) );
@@ -46,7 +34,31 @@ export class BaseService
         return this.handleResponse<OUT>( response );
     }
 
-    protected createRequestOptions( method: RequestMethod, body: string | object )
+    protected async get<OUT>( path?: string )
+    {
+        const request = this.createRequestOptions( "GET" );
+
+        const url = path !== "" ? `${this.getRoute()}/${path}` : this.getRoute();
+
+        console.table( { url: url } );
+
+        const response = await fetch( url, request );
+        return this.handleResponse<OUT>( response );
+    }
+
+    protected async delete<OUT>( path?: string )
+    {
+        const request = this.createRequestOptions( "DELETE" );
+
+        const url = path !== "" ? `${this.getRoute()}/${path}` : this.getRoute();
+
+        console.log( "[DELETE] " + url );
+
+        const response = await fetch( url, request );
+        return this.handleResponse<OUT>( response );
+    }
+
+    protected createRequestOptions( method: RequestMethod, body?: string | object )
     {
         if ( typeof body === "object" )
         {
@@ -70,14 +82,31 @@ export class BaseService
 
     protected async handleResponse<T>( response: Response )
     {
-        if ( response.ok && response.body )
+        if ( response.ok )
         {
-            const user = await response.json() as T;
-            return user;
+            if ( response.body )
+            {
+                const responseText = await response.text();
+                try
+                {
+                    const obj = JSON.parse( responseText ) as T;
+                    return obj;
+                }
+                catch
+                {
+                    return responseText as unknown as T;
+                }
+            }
+            else
+            {
+                return undefined as unknown as T;
+            }
         }
-        else if ( response.type === "error" )
+        else if ( response.type === "error" || response.type === "cors" )
         {
-            throw new Error( await response.json() )
+            const error = await response.text();
+            console.error( error );
+            throw new Error( error )
         }
         else
         {

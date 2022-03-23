@@ -3,7 +3,6 @@ import { getAuth, onAuthStateChanged, onIdTokenChanged, User } from "firebase/au
 import cookie from "js-cookie";
 import { AUTH_TOKEN_COOKIE_NAME } from "../shared/constants";
 
-
 const firebaseConfig = {
     apiKey: "AIzaSyB3GeqXO9V2PT_FJgg2MB1gVwjFK4vWZ_A",
     authDomain: "peperino-app.firebaseapp.com",
@@ -29,7 +28,7 @@ onIdTokenChanged( getAuth(), async ( user ) =>
     await setTokenForUser( user );
 } );
 
-async function setTokenForUser( user: User | null )
+export async function setTokenForUser( user: User | null )
 {
     if ( user )
     {

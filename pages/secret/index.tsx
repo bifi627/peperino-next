@@ -1,7 +1,7 @@
 import { GetServerSideProps } from 'next';
 import { useRouter } from "next/router";
 import React from "react";
-import useFirebaseUser from "../../hooks/useFirebaseUser";
+import useFirebaseUser from "../../hooks/useUser";
 import { BaseService } from "../../services/baseService";
 import UserService from "../../services/userService";
 import { AUTH_TOKEN_COOKIE_NAME } from "../../shared/constants";

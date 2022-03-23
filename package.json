@@ -11,6 +11,11 @@
   "dependencies": {
     "@emotion/react": "^11.8.2",
     "@emotion/styled": "^11.8.1",
+    "@mantine/core": "^4.0.7",
+    "@mantine/form": "^4.0.7",
+    "@mantine/hooks": "^4.0.7",
+    "@mantine/next": "^4.0.7",
+    "@mantine/notifications": "^4.0.7",
     "@mui/icons-material": "^5.5.0",
     "@mui/material": "^5.5.0",
     "firebase": "^9.6.8",
@@ -24,11 +29,9 @@
     "react": "17.0.2",
     "react-dom": "17.0.2",
     "react-firebase-hooks": "^5.0.3",
-    "react-firebaseui": "^6.0.0",
-    "react-hook-form": "^7.27.1",
     "react-hot-toast": "^2.2.0",
     "styled-components": "^5.3.3",
-    "dotenv": "^16.0.0"
+    "tabler-icons-react": "^1.40.0"
   },
   "devDependencies": {
     "@types/js-cookie": "^3.0.1",
