@@ -1,8 +1,5 @@
 import { GetServerSideProps } from 'next';
-import { useRouter } from "next/router";
 import React from "react";
-import useFirebaseUser from "../../hooks/useUser";
-import { BaseService } from "../../services/baseService";
 import UserService from "../../services/userService";
 import { AUTH_TOKEN_COOKIE_NAME } from "../../shared/constants";
 
@@ -26,9 +23,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async ( context ) =
         }
     }
 
-    BaseService.token = token;
-
-    const user = await new UserService().getCurrentUser();
+    const user = await new UserService( token ).getCurrentUser();
 
     return {
         props: { secret: user.username }
@@ -37,10 +32,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async ( context ) =
 
 export default ( props: Props ) =>
 {
-    const user = useFirebaseUser();
-    const router = useRouter();
-
     return (
-        <>{props.secret}</>
+        <>SECRET - {props.secret}</>
     );
 }

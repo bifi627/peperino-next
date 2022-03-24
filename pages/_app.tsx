@@ -9,6 +9,7 @@ import '../styles/globals.css';
 export function MyApp( { Component, pageProps }: AppProps )
 {
     const [ opened, setOpened ] = React.useState( false );
+
     return (
         <NotificationsProvider position="top-right">
             <AppShell

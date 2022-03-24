@@ -4,9 +4,8 @@ import { getAuth, signOut } from "firebase/auth";
 import { GetServerSideProps } from "next";
 import { useRouter } from "next/router";
 import useUser from "../../hooks/useUser";
-import { User } from "../../interfaces/user";
+import { User } from "../../lib/interfaces/user";
 import { KnownRoutes } from "../../lib/routing";
-import { BaseService } from "../../services/baseService";
 import UserService from "../../services/userService";
 import { AUTH_TOKEN_COOKIE_NAME } from "../../shared/constants";
 
@@ -49,10 +48,8 @@ export const getServerSideProps: GetServerSideProps<Props> = async ( context ) =
         }
     }
 
-    BaseService.token = token;
-
-    const user = await new UserService().getUserByUsername( username );
-    const currentUser = await new UserService().getCurrentUser();
+    const user = await new UserService( token ).getUserByUsername( username );
+    const currentUser = await new UserService( token ).getCurrentUser();
     return {
         props: { user: user, isSelf: user.externalId.toLowerCase() === currentUser.externalId.toLowerCase() }
     }

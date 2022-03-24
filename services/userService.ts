@@ -1,4 +1,4 @@
-import { CreateUserRequest, User } from "../interfaces/user";
+import { CreateUserRequest, User } from "../lib/interfaces/user";
 import { Endpoint } from "./apiConfig";
 import { BaseService } from "./baseService";
 
@@ -6,9 +6,9 @@ export default class UserService extends BaseService
 {
     public override readonly endpoint?: Endpoint = "user";
 
-    constructor()
+    constructor( token?: string )
     {
-        super();
+        super( token );
     }
 
     public async createNewUser( username: string, email: string, password: string )

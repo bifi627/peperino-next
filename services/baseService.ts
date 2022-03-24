@@ -6,8 +6,9 @@ export class BaseService
 {
     public readonly endpoint?: Endpoint;
 
-    private static _token?: string;
-    public static set token( token: string )
+    private _token?: string;
+
+    protected constructor( token?: string )
     {
         this._token = token;
     }
@@ -26,7 +27,7 @@ export class BaseService
     {
         const request = this.createRequestOptions( "POST", JSON.stringify( body ) );
 
-        const url = path !== "" ? `${this.getRoute()}/${path}` : this.getRoute();
+        const url = path && path !== "" ? `${this.getRoute()}/${path}` : this.getRoute();
 
         console.table( { url: url, body: body } );
 
@@ -38,7 +39,7 @@ export class BaseService
     {
         const request = this.createRequestOptions( "GET" );
 
-        const url = path !== "" ? `${this.getRoute()}/${path}` : this.getRoute();
+        const url = path && path !== "" ? `${this.getRoute()}/${path}` : this.getRoute();
 
         console.log( "[GET] " + url );
 
@@ -50,7 +51,7 @@ export class BaseService
     {
         const request = this.createRequestOptions( "DELETE" );
 
-        const url = path !== "" ? `${this.getRoute()}/${path}` : this.getRoute();
+        const url = path && path !== "" ? `${this.getRoute()}/${path}` : this.getRoute();
 
         console.log( "[DELETE] " + url );
 
@@ -65,7 +66,7 @@ export class BaseService
             body = JSON.stringify( body );
         }
 
-        const token = BaseService._token ?? cookie.get( AUTH_TOKEN_COOKIE_NAME );
+        const token = this._token ?? cookie.get( AUTH_TOKEN_COOKIE_NAME );
 
         const options = {
             method: method,

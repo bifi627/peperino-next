@@ -1,6 +1,6 @@
 import { BACKEND_URL } from "../shared/constants";
 
-export type Endpoint = "user";
+export type Endpoint = "user" | "list" | "config";
 
 export type RequestMethod = "POST" | "GET" | "PUT" | "DELETE";
 
