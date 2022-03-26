@@ -3,8 +3,8 @@ import { useForm } from "@mantine/form";
 import { useNotifications } from "@mantine/notifications";
 import { useRouter } from "next/router";
 import React from "react";
-import { KnownRoutes } from "../../lib/routing";
 import UserService from "../../services/userService";
+import { KnownRoutes } from "../../shared/knownRoutes";
 
 interface Props
 {

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import useFirebaseUser from "../hooks/useUser";
-import { KnownRoutes } from "../lib/routing";
+import { KnownRoutes } from "../shared/knownRoutes";
 
 interface Props
 {

@@ -2,7 +2,7 @@ import { Burger, Header, MediaQuery } from "@mantine/core";
 import Link from "next/link";
 import styled from "styled-components";
 import useUser from "../../hooks/useUser";
-import { KnownRoutes } from "../../lib/routing";
+import { KnownRoutes } from "../../shared/knownRoutes";
 import AuthCheck from "../AuthCheck";
 import Login from "./components/Login";
 import Logo from "./components/Logo";

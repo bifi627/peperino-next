@@ -5,9 +5,9 @@ import { GetServerSideProps } from "next";
 import { useRouter } from "next/router";
 import useUser from "../../hooks/useUser";
 import { User } from "../../lib/interfaces/user";
-import { KnownRoutes } from "../../lib/routing";
 import UserService from "../../services/userService";
 import { AUTH_TOKEN_COOKIE_NAME } from "../../shared/constants";
+import { KnownRoutes } from "../../shared/knownRoutes";
 
 interface Props
 {

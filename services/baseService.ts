@@ -1,5 +1,6 @@
 import cookie from "js-cookie";
 import { AUTH_TOKEN_COOKIE_NAME } from "../shared/constants";
+import { NetworkError } from "../shared/networkError";
 import { ApiHelper, Endpoint, RequestMethod } from "./apiConfig";
 
 export class BaseService
@@ -112,7 +113,8 @@ export class BaseService
         else
         {
             console.error( response );
-            throw new Error( "Error processing response" );
+            throw new NetworkError( response );
         }
     }
 }
+
