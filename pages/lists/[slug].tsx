@@ -1,12 +1,13 @@
 import { Center, Group, ScrollArea, Space, Tabs, TextInput, UnstyledButton } from "@mantine/core";
-import { useForm } from "@mantine/form";
 import { useNotifications } from "@mantine/notifications";
+import { arrayMoveImmutable } from "array-move";
 import { GetServerSideProps } from "next";
 import { useRouter } from "next/router";
 import { useRef, useState } from "react";
 import { useSwipeable } from "react-swipeable";
 import { Send } from "tabler-icons-react";
-import ListItem from "../../components/List/ListItem";
+import ListItem, { ListItemProps } from "../../components/List/ListItem";
+import { SortableList } from "../../components/List/Sortables";
 import { List, ListItem as ListItemModel } from "../../lib/interfaces/list";
 import ListService from "../../services/listService";
 import { AUTH_TOKEN_COOKIE_NAME } from "../../shared/constants";
@@ -87,24 +88,18 @@ export default ( { list }: Props ) =>
 
     const [ activeTab, setActiveTab ] = useState( 0 );
 
-    const form = useForm( {
-        initialValues: {
-            text: "",
-        },
-    } );
-
     const addItem = async ( e: React.FormEvent<HTMLFormElement> ) =>
     {
         e.preventDefault();
         e.stopPropagation();
 
-        if ( form.values.text.length > 0 )
+        if ( inputRef.current && inputRef.current.value.length > 0 )
         {
             try
             {
-                const newListItem = await new ListService().addTextItemToList( list.slug, form.values.text );
+                const newListItem = await new ListService().addTextItemToList( list.slug, inputRef.current.value );
                 setListItems( [ ...listItems, newListItem ] );
-                form.reset();
+                inputRef.current.value = "";
 
                 if ( viewport.current )
                 {
@@ -140,23 +135,30 @@ export default ( { list }: Props ) =>
 
     const deleteItem = async ( item: ListItemModel ) =>
     {
-
+        const result = await new ListService().deleteItem( list.slug, item );
+        if ( result )
+        {
+            setListItems( prev =>
+            {
+                prev.splice( prev.findIndex( x => x.id === item.id ), 1 );
+                return [ ...prev ];
+            } );
+        }
     };
 
-    const [ scrolling, setScrolling ] = useState( false );
-    const [ timeoutId, setTimeoutId ] = useState<NodeJS.Timeout>();
-    const debounceScrolling = () =>
+    const inputRef = useRef<HTMLInputElement>( null );
+
+    const onSortEnd = async ( { oldIndex, newIndex }: { oldIndex: number, newIndex: number } ) =>
     {
-        // If pending change, cancel
-        timeoutId && clearTimeout( timeoutId );
-        setTimeoutId( undefined );
-        setScrolling( true );
-        console.log( "SCROLLING" );
-        setTimeoutId( setTimeout( async () =>
+        setListItems( prev =>
         {
-            setScrolling( false );
-            console.log( "STOP SCROLLING" );
-        }, 72 ) );
+            return [ ...arrayMoveImmutable( prev, oldIndex, newIndex ) ];
+        } );
+        const result = await new ListService().moveItem( list.slug, oldIndex, newIndex );
+        if ( !result )
+        {
+            alert( "???" );
+        }
     }
 
     return (
@@ -164,18 +166,27 @@ export default ( { list }: Props ) =>
             {list.name} - {list.slug} - {list.listItems.length}
             <Tabs grow position="apart" active={activeTab} onTabChange={setActiveTab}>
                 <Tabs.Tab label="Offen">
-                    <ScrollArea onScroll={debounceScrolling} ref={viewport} type="auto" style={{ overflowY: "scroll", overflowX: "hidden", maxHeight: "calc(100vh - 300px)" }}>
-                        <Space h={"xl"}></Space>
-                        <Group direction="column" style={{ maxWidth: "90vw" }}>
-                            {listItems.filter( item => !item.checked ).map( item => <ListItem skipEvents={scrolling} key={item.id} pressTimeout={3000} item={item} onUpdate={updateItem} onDelete={deleteItem}></ListItem> )}
-                        </Group>
-                        <Space h={"xl"}></Space>
-                    </ScrollArea>
+                    <Space h={"xl"}></Space>
+                    <div ref={viewport} style={{ maxHeight: "calc(100vh - 350px)", overflow: "auto" }}>
+                        <SortableList onSortEnd={onSortEnd} useDragHandle lockAxis="y" pressDelay={100} itemProps={listItems.filter( item => !item.checked ).map( item =>
+                        {
+                            return {
+                                item: item,
+                                onUpdate: ( i ) => updateItem( i ),
+                                onDelete: ( i ) => deleteItem( i ),
+                                pressTimeout: 3000
+                            } as ListItemProps;
+                        } )}></SortableList>
+                    </div>
+                    {/* {listItems.filter( item => !item.checked ).map( ( item, index ) => <SortableListItem skipEvents={scrolling} key={item.id} pressTimeout={3000} item={item} onUpdate={updateItem} onDelete={deleteItem} index={index}></SortableListItem> )} */}
+                    <Space h={"xl"}></Space>
                     <form style={{ display: "grid", gridTemplateColumns: "1fr 45px", gap: "10px" }} onSubmit={addItem}>
                         <TextInput
+                            autoComplete="false"
+                            ref={inputRef}
                             required
                             autoFocus
-                            {...form.getInputProps( "text" )} ></TextInput>
+                        ></TextInput>
                         <UnstyledButton type="submit" style={{ background: "#228be6", borderRadius: "20px" }}>
                             <Center>
                                 <Send color={"white"}></Send>
@@ -184,7 +195,7 @@ export default ( { list }: Props ) =>
                     </form>
                 </Tabs.Tab>
                 <Tabs.Tab label="Fertig">
-                    <ScrollArea type="auto" style={{ overflowX: "auto", maxHeight: "calc(100vh - 150px)" }}>
+                    <ScrollArea type="auto" style={{ overflowY: "scroll", overflowX: "hidden", maxHeight: "calc(100vh - 150px)" }}>
                         <Space h={"xl"}></Space>
                         <Group direction="column">
                             {listItems.filter( item => item.checked ).map( item => <ListItem key={item.id} item={item} onUpdate={updateItem} onDelete={deleteItem}></ListItem> )}

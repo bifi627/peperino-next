@@ -1,28 +1,25 @@
 import { Button, Checkbox, Group, Text, TextInput } from "@mantine/core";
 import { useState } from "react";
 import styled from "styled-components";
-import { Check, Loader, Trash } from "tabler-icons-react";
-import useLongPress from "../../hooks/useLongPress";
+import { Check, Loader, Settings, Trash, X } from "tabler-icons-react";
 import { ListItem } from "../../lib/interfaces/list";
 
-interface Props
+export interface ListItemProps
 {
     item: ListItem;
     onUpdate: ( item: ListItem ) => void;
-    pressTimeout?: number;
     onDelete: ( item: ListItem ) => void;
-    skipEvents?: boolean;
+    pressTimeout?: number;
 }
 
 const Box = styled.div`
     width: 100%;
 `;
 
-export default ( { item, pressTimeout, onUpdate, onDelete, skipEvents }: Props ) =>
+export default ( { item, onUpdate, onDelete, pressTimeout }: ListItemProps ) =>
 {
     const [ indeterminate, setIndeterminate ] = useState( false );
     const [ timeoutId, setTimeoutId ] = useState<NodeJS.Timeout>();
-
     const [ innerText, setInnerText ] = useState( item.text );
 
     const longDebounceDispatch = () =>
@@ -41,41 +38,36 @@ export default ( { item, pressTimeout, onUpdate, onDelete, skipEvents }: Props )
             {
                 item.checked = !item.checked;
                 onUpdate( item );
-            }, pressTimeout ?? 72 ) );
+            }, pressTimeout ?? 73 ) );
             setIndeterminate( true );
         }
     }
 
-    const onLongPress = ( e: React.MouseEvent<HTMLElement, MouseEvent> | React.TouchEvent<HTMLElement> ) =>
+    const onToggleEdit = () =>
     {
-        !skipEvents && setEditMode( true );
-    };
+        setEditMode( e => !e );
+        setInnerText( item.text );
+    }
 
     const onClick = ( e: React.MouseEvent<HTMLElement, MouseEvent> | React.TouchEvent<HTMLElement> ) =>
     {
-        !editMode && !skipEvents && longDebounceDispatch();
+        !editMode && longDebounceDispatch();
     }
     const [ editMode, setEditMode ] = useState( false );
 
-    const defaultOptions = {
-        shouldPreventDefault: !editMode,
-        delay: 500,
-    };
-    const longPressEvent = useLongPress( onLongPress, onClick, defaultOptions );
-
     return (
         <div style={{ display: "flex", flexDirection: "row", width: "100%" }}>
-            <Box {...longPressEvent} key={item.id}>
+            <Box onClick={onClick} key={item.id}>
                 {editMode ?
                     <Group direction="row">
-                        <TextInput style={{ width: "calc(100% - 200px)" }} autoFocus value={innerText} onChange={e => setInnerText( e.currentTarget.value )}></TextInput>
+                        <TextInput style={{ width: "calc(100% - 200px)" }} autoFocus value={innerText} size="xs" onChange={e => setInnerText( e.currentTarget.value )}></TextInput>
                         <Button variant="light" leftIcon={<Check />} size="xs" type="button" onClick={() => { setEditMode( false ); onUpdate( { ...item, text: innerText } ) }}></Button>
                         <Button variant="light" leftIcon={<Trash />} size="xs" type="button" onClick={() => { setEditMode( false ); onDelete( item ); }}></Button>
                     </Group>
                     :
                     <Checkbox
                         icon={( { indeterminate, className } ) => indeterminate ? <Loader className={className} /> : <Check className={className} />}
-                        style={{ maxWidth: "90vw", overflow: "hidden", userSelect: "none" }}
+                        style={{ maxWidth: "90vw", overflow: "hidden", userSelect: "none", width: "100%" }}
                         indeterminate={!!pressTimeout && indeterminate}
                         size="md"
                         checked={item.checked}
@@ -83,6 +75,7 @@ export default ( { item, pressTimeout, onUpdate, onDelete, skipEvents }: Props )
                         label={<Text underline={editMode}>{item.text}</Text>}
                     />}
             </Box>
+            <Button size="xs" variant="light" onClick={onToggleEdit} leftIcon={editMode ? <X /> : <Settings />}></Button>
         </div>
     );
 }

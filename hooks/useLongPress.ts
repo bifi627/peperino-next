@@ -18,7 +18,7 @@ const useLongPress = (
             if ( shouldPreventDefault && event.target )
             {
                 ( event.target as any ).addEventListener( "touchend", preventDefault, {
-                    passive: false
+                    passive: false,
                 } );
                 ( target.current as any ) = event.target;
             }

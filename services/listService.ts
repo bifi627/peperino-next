@@ -1,5 +1,5 @@
 import slugify from "slugify";
-import { List, ListItem } from "../lib/interfaces/list";
+import { List, ListItem, MoveItemRequest } from "../lib/interfaces/list";
 import { Endpoint } from "./apiConfig";
 import { BaseService } from "./baseService";
 
@@ -36,5 +36,15 @@ export default class ListService extends BaseService
     public updateItem( slug: string, item: ListItem )
     {
         return this.put<ListItem, boolean>( `${slug}/${item.id}`, item );
+    }
+
+    public deleteItem( slug: string, item: ListItem )
+    {
+        return this.delete<boolean>( `${slug}/${item.id}` );
+    }
+
+    public moveItem( slug: string, from: number, to: number )
+    {
+        return this.post<MoveItemRequest, List>( slug + "/move", { from: from, to: to } );
     }
 }

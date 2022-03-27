@@ -22,8 +22,8 @@ export enum ItemType
     Document = "Document",
 }
 
-export interface CheckItemRequest
+export interface MoveItemRequest
 {
-    id: string;
-    checked: boolean;
+    from: number;
+    to: number;
 }
