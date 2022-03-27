@@ -36,6 +36,18 @@ export class BaseService
         return this.handleResponse<OUT>( response );
     }
 
+    protected async put<IN, OUT>( path?: string, body?: IN )
+    {
+        const request = this.createRequestOptions( "PUT", JSON.stringify( body ) );
+
+        const url = path && path !== "" ? `${this.getRoute()}/${path}` : this.getRoute();
+
+        console.table( { url: url, body: body } );
+
+        const response = await fetch( url, request );
+        return this.handleResponse<OUT>( response );
+    }
+
     protected async get<OUT>( path?: string )
     {
         const request = this.createRequestOptions( "GET" );

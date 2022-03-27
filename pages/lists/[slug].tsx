@@ -125,21 +125,38 @@ export default ( { list }: Props ) =>
         }
     }
 
-    const changeCheckState = async ( item: ListItemModel ) =>
+    const updateItem = async ( item: ListItemModel ) =>
     {
-        const result = await new ListService().checkItem( list.slug, item.id, !item.checked );
+        const result = await new ListService().updateItem( list.slug, item );
         if ( result )
         {
             setListItems( prev =>
             {
-                const update = prev.find( x => x.id === item.id );
-                if ( update )
-                {
-                    update.checked = !item.checked;
-                }
+                prev.splice( prev.findIndex( x => x.id === item.id ), 1, item );
                 return [ ...prev ];
             } );
         }
+    };
+
+    const deleteItem = async ( item: ListItemModel ) =>
+    {
+
+    };
+
+    const [ scrolling, setScrolling ] = useState( false );
+    const [ timeoutId, setTimeoutId ] = useState<NodeJS.Timeout>();
+    const debounceScrolling = () =>
+    {
+        // If pending change, cancel
+        timeoutId && clearTimeout( timeoutId );
+        setTimeoutId( undefined );
+        setScrolling( true );
+        console.log( "SCROLLING" );
+        setTimeoutId( setTimeout( async () =>
+        {
+            setScrolling( false );
+            console.log( "STOP SCROLLING" );
+        }, 72 ) );
     }
 
     return (
@@ -147,13 +164,10 @@ export default ( { list }: Props ) =>
             {list.name} - {list.slug} - {list.listItems.length}
             <Tabs grow position="apart" active={activeTab} onTabChange={setActiveTab}>
                 <Tabs.Tab label="Offen">
-                    <ScrollArea ref={viewport} type="auto" style={{ overflowX: "auto", overflowY: "hidden", maxHeight: "calc(100vh - 250px)" }}>
+                    <ScrollArea onScroll={debounceScrolling} ref={viewport} type="auto" style={{ overflowY: "scroll", overflowX: "hidden", maxHeight: "calc(100vh - 300px)" }}>
                         <Space h={"xl"}></Space>
                         <Group direction="column" style={{ maxWidth: "90vw" }}>
-                            {listItems.filter( item => !item.checked ).map( item => <ListItem key={item.id} pressTimeout={3000} item={item} onPress={changeCheckState} onDelete={( item ) =>
-                            {
-                                alert( "TODO: DELETE" );
-                            }}></ListItem> )}
+                            {listItems.filter( item => !item.checked ).map( item => <ListItem skipEvents={scrolling} key={item.id} pressTimeout={3000} item={item} onUpdate={updateItem} onDelete={deleteItem}></ListItem> )}
                         </Group>
                         <Space h={"xl"}></Space>
                     </ScrollArea>
@@ -173,10 +187,7 @@ export default ( { list }: Props ) =>
                     <ScrollArea type="auto" style={{ overflowX: "auto", maxHeight: "calc(100vh - 150px)" }}>
                         <Space h={"xl"}></Space>
                         <Group direction="column">
-                            {listItems.filter( item => item.checked ).map( item => <ListItem key={item.id} item={item} onPress={changeCheckState} onDelete={( item ) =>
-                            {
-                                alert( "TODO: DELETE" );
-                            }}></ListItem> )}
+                            {listItems.filter( item => item.checked ).map( item => <ListItem key={item.id} item={item} onUpdate={updateItem} onDelete={deleteItem}></ListItem> )}
                         </Group>
                         <Space h={"xl"}></Space>
                     </ScrollArea>

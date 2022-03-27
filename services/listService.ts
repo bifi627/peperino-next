@@ -1,5 +1,5 @@
 import slugify from "slugify";
-import { CheckItemRequest, List, ListItem } from "../lib/interfaces/list";
+import { List, ListItem } from "../lib/interfaces/list";
 import { Endpoint } from "./apiConfig";
 import { BaseService } from "./baseService";
 
@@ -33,8 +33,8 @@ export default class ListService extends BaseService
         return this.post<string, ListItem>( slug + "/text", item );
     }
 
-    public checkItem( slug: string, itemId: string, checked: boolean )
+    public updateItem( slug: string, item: ListItem )
     {
-        return this.post<CheckItemRequest, boolean>( slug + "/check", { checked: checked, id: itemId } );
+        return this.put<ListItem, boolean>( `${slug}/${item.id}`, item );
     }
 }

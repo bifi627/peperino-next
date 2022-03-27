@@ -1,4 +1,4 @@
-import { Button, Checkbox, Group, Popover, Text } from "@mantine/core";
+import { Button, Checkbox, Group, Text, TextInput } from "@mantine/core";
 import { useState } from "react";
 import styled from "styled-components";
 import { Check, Loader, Trash } from "tabler-icons-react";
@@ -8,19 +8,22 @@ import { ListItem } from "../../lib/interfaces/list";
 interface Props
 {
     item: ListItem;
-    onPress: ( item: ListItem ) => void;
+    onUpdate: ( item: ListItem ) => void;
     pressTimeout?: number;
     onDelete: ( item: ListItem ) => void;
+    skipEvents?: boolean;
 }
 
 const Box = styled.div`
     width: 100%;
 `;
 
-export default ( { item, pressTimeout, onPress, onDelete }: Props ) =>
+export default ( { item, pressTimeout, onUpdate, onDelete, skipEvents }: Props ) =>
 {
     const [ indeterminate, setIndeterminate ] = useState( false );
     const [ timeoutId, setTimeoutId ] = useState<NodeJS.Timeout>();
+
+    const [ innerText, setInnerText ] = useState( item.text );
 
     const longDebounceDispatch = () =>
     {
@@ -36,7 +39,8 @@ export default ( { item, pressTimeout, onPress, onDelete }: Props ) =>
             // Queue change
             setTimeoutId( setTimeout( async () =>
             {
-                onPress( item );
+                item.checked = !item.checked;
+                onUpdate( item );
             }, pressTimeout ?? 72 ) );
             setIndeterminate( true );
         }
@@ -44,48 +48,41 @@ export default ( { item, pressTimeout, onPress, onDelete }: Props ) =>
 
     const onLongPress = ( e: React.MouseEvent<HTMLElement, MouseEvent> | React.TouchEvent<HTMLElement> ) =>
     {
-        setPopupOpened( true );
+        !skipEvents && setEditMode( true );
     };
 
     const onClick = ( e: React.MouseEvent<HTMLElement, MouseEvent> | React.TouchEvent<HTMLElement> ) =>
     {
-        !popupOpened && longDebounceDispatch();
+        !editMode && !skipEvents && longDebounceDispatch();
     }
+    const [ editMode, setEditMode ] = useState( false );
 
     const defaultOptions = {
-        shouldPreventDefault: true,
+        shouldPreventDefault: !editMode,
         delay: 500,
     };
     const longPressEvent = useLongPress( onLongPress, onClick, defaultOptions );
 
-    const [ popupOpened, setPopupOpened ] = useState( false );
-
     return (
         <div style={{ display: "flex", flexDirection: "row", width: "100%" }}>
             <Box {...longPressEvent} key={item.id}>
-                <Checkbox
-                    icon={( { indeterminate, className } ) => indeterminate ? <Loader className={className} /> : <Check className={className} />}
-                    style={{ maxWidth: "90vw", overflow: "hidden", userSelect: "none" }}
-                    indeterminate={!!pressTimeout && indeterminate}
-                    size="md"
-                    checked={item.checked}
-                    onChange={e => e}
-                    label={<Text underline={popupOpened}>{item.text}</Text>}
-                />
+                {editMode ?
+                    <Group direction="row">
+                        <TextInput style={{ width: "calc(100% - 200px)" }} autoFocus value={innerText} onChange={e => setInnerText( e.currentTarget.value )}></TextInput>
+                        <Button variant="light" leftIcon={<Check />} size="xs" type="button" onClick={() => { setEditMode( false ); onUpdate( { ...item, text: innerText } ) }}></Button>
+                        <Button variant="light" leftIcon={<Trash />} size="xs" type="button" onClick={() => { setEditMode( false ); onDelete( item ); }}></Button>
+                    </Group>
+                    :
+                    <Checkbox
+                        icon={( { indeterminate, className } ) => indeterminate ? <Loader className={className} /> : <Check className={className} />}
+                        style={{ maxWidth: "90vw", overflow: "hidden", userSelect: "none" }}
+                        indeterminate={!!pressTimeout && indeterminate}
+                        size="md"
+                        checked={item.checked}
+                        onChange={e => e}
+                        label={<Text underline={editMode}>{item.text}</Text>}
+                    />}
             </Box>
-            <Popover
-                radius={20}
-                opened={popupOpened}
-                onClose={() => setPopupOpened( false )}
-                position="bottom"
-                target={
-                    <></>
-                }            >
-                <Group direction="column">
-                    <Button variant="light" leftIcon={<Trash />} fullWidth size="xs" color="red" type="button" onClick={() => { setPopupOpened( false ); onDelete( item ); }}></Button>
-                    <Button variant="light" fullWidth size="xs" type="button" onClick={() => setPopupOpened( false )}>Abbrechen</Button>
-                </Group>
-            </Popover>
         </div>
     );
 }
