@@ -1,25 +1,25 @@
-import { Center, Group, ScrollArea, Space, Tabs, TextInput, UnstyledButton } from "@mantine/core";
+import { Center, Group, Space, Tabs, TextInput, UnstyledButton } from "@mantine/core";
 import { useNotifications } from "@mantine/notifications";
-import { arrayMoveImmutable } from "array-move";
+import { observer } from "mobx-react-lite";
 import { GetServerSideProps } from "next";
 import { useRouter } from "next/router";
 import { useRef, useState } from "react";
 import { useSwipeable } from "react-swipeable";
+import styled from "styled-components";
 import { Send } from "tabler-icons-react";
-import ListItem, { ListItemProps } from "../../components/List/ListItem";
-import { SortableList } from "../../components/List/Sortables";
 import { List, ListItem as ListItemModel } from "../../lib/interfaces/list";
 import ListService from "../../services/listService";
 import { AUTH_TOKEN_COOKIE_NAME } from "../../shared/constants";
 import { KnownRoutes } from "../../shared/knownRoutes";
 import { NetworkError } from "../../shared/networkError";
+import ListItem, { ListItemProps } from "./components/ListItem";
+import { SortableList } from "./components/Sortables";
+import { ListViewModel } from "./viewModels/ListViewModel";
 
 interface Props
 {
     list: List;
 }
-
-const applyChangeTimeoutMs = 3000;
 
 export const getServerSideProps: GetServerSideProps<Props> = async ( context ) =>
 {
@@ -62,12 +62,33 @@ export const getServerSideProps: GetServerSideProps<Props> = async ( context ) =
     }
 }
 
-export default ( { list }: Props ) =>
+const ItemBox = styled.div`
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    gap: 20px;
+    padding-left: 40px;
+`;
+
+const SwipeBox = styled.div`
+    height: calc(100vh - 150px);
+`;
+
+const ScrollBox = styled.div`
+    max-height: calc(100vh - 350px);
+    overflow: auto;
+`;
+
+export default observer( ( { list }: Props ) =>
 {
     const router = useRouter();
     const notifications = useNotifications();
 
-    const viewport = useRef<HTMLDivElement>( null );
+    const [ vm ] = useState( new ListViewModel( list ) );
+    const [ activeTab, setActiveTab ] = useState( 0 );
+
+    const inputRef = useRef<HTMLInputElement>( null );
+    const scrollRef = useRef<HTMLDivElement>( null );
 
     const handlers = useSwipeable( {
         onSwiped: ( eventData ) =>
@@ -84,11 +105,7 @@ export default ( { list }: Props ) =>
         },
     } );
 
-    const [ listItems, setListItems ] = useState( list.listItems );
-
-    const [ activeTab, setActiveTab ] = useState( 0 );
-
-    const addItem = async ( e: React.FormEvent<HTMLFormElement> ) =>
+    const onSubmitAddItem = async ( e: React.FormEvent<HTMLFormElement> ) =>
     {
         e.preventDefault();
         e.stopPropagation();
@@ -97,14 +114,15 @@ export default ( { list }: Props ) =>
         {
             try
             {
-                const newListItem = await new ListService().addTextItemToList( list.slug, inputRef.current.value );
-                setListItems( [ ...listItems, newListItem ] );
+                const newItem = await new ListService().addTextItemToList( list.slug, inputRef.current.value );
+                vm.addItem( newItem );
+
                 inputRef.current.value = "";
 
-                if ( viewport.current )
+                if ( scrollRef.current )
                 {
-                    console.log( viewport.current.scrollHeight );
-                    viewport.current.scrollTo( { top: viewport.current.scrollHeight, behavior: 'smooth' } );
+                    console.log( scrollRef.current.scrollHeight );
+                    scrollRef.current.scrollTo( { top: scrollRef.current.scrollHeight, behavior: 'smooth' } );
                 }
 
             }
@@ -125,11 +143,7 @@ export default ( { list }: Props ) =>
         const result = await new ListService().updateItem( list.slug, item );
         if ( result )
         {
-            setListItems( prev =>
-            {
-                prev.splice( prev.findIndex( x => x.id === item.id ), 1, item );
-                return [ ...prev ];
-            } );
+            vm.updateItem( item );
         }
     };
 
@@ -138,37 +152,24 @@ export default ( { list }: Props ) =>
         const result = await new ListService().deleteItem( list.slug, item );
         if ( result )
         {
-            setListItems( prev =>
-            {
-                prev.splice( prev.findIndex( x => x.id === item.id ), 1 );
-                return [ ...prev ];
-            } );
+            vm.deleteItem( item );
         }
     };
 
-    const inputRef = useRef<HTMLInputElement>( null );
-
     const onSortEnd = async ( { oldIndex, newIndex }: { oldIndex: number, newIndex: number } ) =>
     {
-        setListItems( prev =>
-        {
-            return [ ...arrayMoveImmutable( prev, oldIndex, newIndex ) ];
-        } );
-        const result = await new ListService().moveItem( list.slug, oldIndex, newIndex );
-        if ( !result )
-        {
-            alert( "???" );
-        }
+        vm.rearrangeCheckedItems( oldIndex, newIndex );
+        await new ListService().moveCheckedItem( list.slug, oldIndex, newIndex );
     }
 
     return (
-        <div {...handlers} style={{ height: "calc(100vh - 150px)" }}>
+        <SwipeBox {...handlers}>
             {list.name} - {list.slug} - {list.listItems.length}
             <Tabs grow position="apart" active={activeTab} onTabChange={setActiveTab}>
                 <Tabs.Tab label="Offen">
                     <Space h={"xl"}></Space>
-                    <div ref={viewport} style={{ maxHeight: "calc(100vh - 350px)", overflow: "auto" }}>
-                        <SortableList onSortEnd={onSortEnd} useDragHandle lockAxis="y" pressDelay={100} itemProps={listItems.filter( item => !item.checked ).map( item =>
+                    <ScrollBox ref={scrollRef}>
+                        <SortableList onSortEnd={onSortEnd} useDragHandle lockAxis="y" pressDelay={100} itemProps={vm.uncheckedItems.map( item =>
                         {
                             return {
                                 item: item,
@@ -177,10 +178,9 @@ export default ( { list }: Props ) =>
                                 pressTimeout: 3000
                             } as ListItemProps;
                         } )}></SortableList>
-                    </div>
-                    {/* {listItems.filter( item => !item.checked ).map( ( item, index ) => <SortableListItem skipEvents={scrolling} key={item.id} pressTimeout={3000} item={item} onUpdate={updateItem} onDelete={deleteItem} index={index}></SortableListItem> )} */}
+                    </ScrollBox>
                     <Space h={"xl"}></Space>
-                    <form style={{ display: "grid", gridTemplateColumns: "1fr 45px", gap: "10px" }} onSubmit={addItem}>
+                    <form style={{ display: "grid", gridTemplateColumns: "1fr 45px", gap: "10px" }} onSubmit={onSubmitAddItem}>
                         <TextInput
                             autoComplete="false"
                             ref={inputRef}
@@ -195,16 +195,22 @@ export default ( { list }: Props ) =>
                     </form>
                 </Tabs.Tab>
                 <Tabs.Tab label="Fertig">
-                    <ScrollArea type="auto" style={{ overflowY: "scroll", overflowX: "hidden", maxHeight: "calc(100vh - 150px)" }}>
+                    <ScrollBox>
                         <Space h={"xl"}></Space>
                         <Group direction="column">
-                            {listItems.filter( item => item.checked ).map( item => <ListItem key={item.id} item={item} onUpdate={updateItem} onDelete={deleteItem}></ListItem> )}
+                            {vm.checkedItems.map( item => 
+                            {
+                                return (
+                                    <ItemBox key={item.id}>
+                                        <ListItem item={item} onUpdate={updateItem} onDelete={deleteItem}></ListItem>
+                                    </ItemBox>
+                                )
+                            } )}
                         </Group>
                         <Space h={"xl"}></Space>
-                    </ScrollArea>
+                    </ScrollBox>
                 </Tabs.Tab>
             </Tabs>
-        </div>
+        </SwipeBox>
     );
-}
-
+} );

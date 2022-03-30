@@ -2,7 +2,7 @@ import { Button, Checkbox, Group, Text, TextInput } from "@mantine/core";
 import { useState } from "react";
 import styled from "styled-components";
 import { Check, Loader, Settings, Trash, X } from "tabler-icons-react";
-import { ListItem } from "../../lib/interfaces/list";
+import { ListItem } from "../../../lib/interfaces/list";
 
 export interface ListItemProps
 {
@@ -14,6 +14,9 @@ export interface ListItemProps
 
 const Box = styled.div`
     width: 100%;
+    display: flex;
+    flex-direction: row;
+    width: "100%";
 `;
 
 export default ( { item, onUpdate, onDelete, pressTimeout }: ListItemProps ) =>
@@ -56,7 +59,7 @@ export default ( { item, onUpdate, onDelete, pressTimeout }: ListItemProps ) =>
     const [ editMode, setEditMode ] = useState( false );
 
     return (
-        <div style={{ display: "flex", flexDirection: "row", width: "100%" }}>
+        <>
             <Box onClick={onClick} key={item.id}>
                 {editMode ?
                     <Group direction="row">
@@ -76,6 +79,6 @@ export default ( { item, onUpdate, onDelete, pressTimeout }: ListItemProps ) =>
                     />}
             </Box>
             <Button size="xs" variant="light" onClick={onToggleEdit} leftIcon={editMode ? <X /> : <Settings />}></Button>
-        </div>
+        </>
     );
 }

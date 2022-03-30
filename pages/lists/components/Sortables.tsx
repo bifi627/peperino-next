@@ -1,5 +1,6 @@
 import { Group } from "@mantine/core";
 import { SortableContainer, SortableElement, SortableHandle } from "react-sortable-hoc";
+import styled from "styled-components";
 import { Menu } from "tabler-icons-react";
 import ListItem, { ListItemProps } from "./ListItem";
 interface Props
@@ -15,13 +16,20 @@ export const SortableList = SortableContainer( ( props: Props ) =>
     );
 } );
 
+const ItemBox = styled.div`
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    gap: 20px;
+`;
+
 export const SortableListItem = SortableElement( ( props: ListItemProps ) =>
 {
     return (
-        <div style={{ display: "flex", flexDirection: "row", gap: "20px", width: "100%" }}>
+        <ItemBox>
             <DragHandle />
             <ListItem {...props}></ListItem>
-        </div>
+        </ItemBox>
     );
 } );
 

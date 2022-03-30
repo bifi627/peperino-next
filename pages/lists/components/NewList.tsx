@@ -1,6 +1,6 @@
 import { Button, Group, Modal, Space, TextInput, useMantineTheme } from "@mantine/core";
 import { useForm } from "@mantine/form";
-import { List } from "../../lib/interfaces/list";
+import { List } from "../../../lib/interfaces/list";
 
 interface Props
 {

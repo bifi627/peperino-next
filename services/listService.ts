@@ -43,7 +43,7 @@ export default class ListService extends BaseService
         return this.delete<boolean>( `${slug}/${item.id}` );
     }
 
-    public moveItem( slug: string, from: number, to: number )
+    public moveCheckedItem( slug: string, from: number, to: number )
     {
         return this.post<MoveItemRequest, List>( slug + "/move", { from: from, to: to } );
     }
