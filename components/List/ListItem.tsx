@@ -2,7 +2,7 @@ import { Button, Checkbox, Group, Text, TextInput } from "@mantine/core";
 import { useState } from "react";
 import styled from "styled-components";
 import { Check, Loader, Settings, Trash, X } from "tabler-icons-react";
-import { ListItem } from "../../../lib/interfaces/list";
+import { ListItem } from "../../lib/interfaces/list";
 
 export interface ListItemProps
 {

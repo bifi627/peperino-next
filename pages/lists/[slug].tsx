@@ -7,14 +7,14 @@ import { useRef, useState } from "react";
 import { useSwipeable } from "react-swipeable";
 import styled from "styled-components";
 import { Send } from "tabler-icons-react";
+import ListItem, { ListItemProps } from "../../components/List/ListItem";
+import { SortableList } from "../../components/List/Sortables";
 import { List, ListItem as ListItemModel } from "../../lib/interfaces/list";
 import ListService from "../../services/listService";
 import { AUTH_TOKEN_COOKIE_NAME } from "../../shared/constants";
 import { KnownRoutes } from "../../shared/knownRoutes";
 import { NetworkError } from "../../shared/networkError";
-import ListItem, { ListItemProps } from "./components/ListItem";
-import { SortableList } from "./components/Sortables";
-import { ListViewModel } from "./viewModels/ListViewModel";
+import { ListViewModel } from "../../viewModels/list/ListViewModel";
 
 interface Props
 {

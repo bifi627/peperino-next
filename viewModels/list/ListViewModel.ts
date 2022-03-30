@@ -1,6 +1,6 @@
 import { arrayMoveImmutable } from "array-move";
 import { action, computed, isObservableArray, makeObservable, observable } from "mobx";
-import { List, ListItem } from "../../../lib/interfaces/list";
+import { List, ListItem } from "../../lib/interfaces/list";
 
 export class ListViewModel implements List
 {

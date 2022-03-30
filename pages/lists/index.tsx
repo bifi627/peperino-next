@@ -5,11 +5,11 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import { Plus } from 'tabler-icons-react';
+import NewList from "../../components/List/NewList";
 import { List } from "../../lib/interfaces/list";
 import ListService from "../../services/listService";
 import { AUTH_TOKEN_COOKIE_NAME } from "../../shared/constants";
 import { KnownRoutes } from "../../shared/knownRoutes";
-import NewList from "./components/NewList";
 
 interface Props
 {
