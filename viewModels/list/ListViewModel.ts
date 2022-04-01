@@ -1,6 +1,7 @@
 import { arrayMoveImmutable } from "array-move";
 import { action, computed, isObservableArray, makeObservable, observable } from "mobx";
 import { List, ListItem } from "../../lib/interfaces/list";
+import ListService from "../../services/listService";
 
 export class ListViewModel implements List
 {
@@ -29,6 +30,15 @@ export class ListViewModel implements List
         this.listItems = data.listItems;
 
         makeObservable( this );
+    }
+
+    @action async reloadItems()
+    {
+        if ( isObservableArray( this.listItems ) )
+        {
+            const list = await new ListService().getBySlug( this.slug );
+            this.listItems.replace( list.listItems );
+        }
     }
 
     @action

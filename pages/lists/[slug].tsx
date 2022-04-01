@@ -3,12 +3,13 @@ import { useNotifications } from "@mantine/notifications";
 import { observer } from "mobx-react-lite";
 import { GetServerSideProps } from "next";
 import { useRouter } from "next/router";
-import { useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { useSwipeable } from "react-swipeable";
 import styled from "styled-components";
 import { Send } from "tabler-icons-react";
 import ListItem, { ListItemProps } from "../../components/List/ListItem";
 import { SortableList } from "../../components/List/Sortables";
+import { useSignal } from "../../hooks/useSignal";
 import { List, ListItem as ListItemModel } from "../../lib/interfaces/list";
 import ListService from "../../services/listService";
 import { AUTH_TOKEN_COOKIE_NAME } from "../../shared/constants";
@@ -85,6 +86,14 @@ export default observer( ( { list }: Props ) =>
     const notifications = useNotifications();
 
     const [ vm ] = useState( new ListViewModel( list ) );
+
+    const cb = useCallback( () =>
+    {
+        vm.reloadItems();
+    }, [ vm ] )
+
+    useSignal( "notification", `list_${list.slug}`, cb );
+
     const [ activeTab, setActiveTab ] = useState( 0 );
 
     const inputRef = useRef<HTMLInputElement>( null );
