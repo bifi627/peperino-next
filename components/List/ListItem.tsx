@@ -1,7 +1,8 @@
-import { Button, Checkbox, Group, Text, TextInput } from "@mantine/core";
+import { Center, Checkbox, Group, Text, TextInput, UnstyledButton, useMantineTheme } from "@mantine/core";
 import { useState } from "react";
 import styled from "styled-components";
-import { Check, Loader, Settings, Trash, X } from "tabler-icons-react";
+import { Check, Loader, QuestionMark, Settings, Trash, X } from "tabler-icons-react";
+import useLongPress from "../../hooks/useLongPress";
 import { ListItem } from "../../lib/interfaces/list";
 
 export interface ListItemProps
@@ -16,11 +17,19 @@ const Box = styled.div`
     width: 100%;
     display: flex;
     flex-direction: row;
-    width: "100%";
+`;
+
+export const IconButton = styled( UnstyledButton ) <{ color: string, background: string, radius?: number }>`
+    padding: 5px;
+    border-radius: 20px;
+    color: ${p => p.color};
+    background: ${p => p.background};
 `;
 
 export default ( { item, onUpdate, onDelete, pressTimeout }: ListItemProps ) =>
 {
+    const theme = useMantineTheme();
+
     const [ indeterminate, setIndeterminate ] = useState( false );
     const [ timeoutId, setTimeoutId ] = useState<NodeJS.Timeout>();
     const [ innerText, setInnerText ] = useState( item.text );
@@ -50,6 +59,11 @@ export default ( { item, onUpdate, onDelete, pressTimeout }: ListItemProps ) =>
     {
         setEditMode( e => !e );
         setInnerText( item.text );
+
+        if ( confirmDelete === true )
+        {
+            setConfirmDelete( false );
+        }
     }
 
     const onClick = ( e: React.MouseEvent<HTMLElement, MouseEvent> | React.TouchEvent<HTMLElement> ) =>
@@ -58,17 +72,45 @@ export default ( { item, onUpdate, onDelete, pressTimeout }: ListItemProps ) =>
     }
     const [ editMode, setEditMode ] = useState( false );
 
+    const [ confirmDelete, setConfirmDelete ] = useState( false );
+
+    const o = useLongPress( e =>
+    {
+        setEditMode( true );
+    }, e => { } );
+
     return (
         <>
-            <Box onClick={onClick} key={item.id}>
+            <Box key={item.id}>
                 {editMode ?
-                    <Group direction="row">
-                        <TextInput style={{ width: "calc(100% - 200px)" }} autoFocus value={innerText} size="xs" onChange={e => setInnerText( e.currentTarget.value )}></TextInput>
-                        <Button variant="light" leftIcon={<Check />} size="xs" type="button" onClick={() => { setEditMode( false ); onUpdate( { ...item, text: innerText } ) }}></Button>
-                        <Button variant="light" leftIcon={<Trash />} size="xs" type="button" onClick={() => { setEditMode( false ); onDelete( item ); }}></Button>
+                    <Group sx={{ width: "100%", flexWrap: "nowrap" }} direction="row">
+                        <TextInput sx={{ width: "100%" }} autoFocus value={innerText} size="xs" onChange={e => setInnerText( e.currentTarget.value )}></TextInput>
+                        <IconButton radius={20} color={theme.white} background={theme.colors.green[ 6 ]} onClick={() => { setEditMode( false ); onUpdate( { ...item, text: innerText } ) }}>
+                            <Center>
+                                <Check />
+                            </Center>
+                        </IconButton>
+                        <IconButton radius={20} color={theme.white} background={theme.colors.red[ 6 ]} onClick={() =>
+                        {
+                            if ( confirmDelete === true )
+                            {
+                                setEditMode( false );
+                                setConfirmDelete( false );
+                                onDelete( item );
+                            }
+                            else
+                            {
+                                setConfirmDelete( true );
+                            }
+                        }}>
+                            <Center>
+                                {confirmDelete ? <QuestionMark /> : <Trash />}
+                            </Center>
+                        </IconButton>
                     </Group>
                     :
                     <Checkbox
+                        onClick={onClick}
                         icon={( { indeterminate, className } ) => indeterminate ? <Loader className={className} /> : <Check className={className} />}
                         style={{ maxWidth: "90vw", overflow: "hidden", userSelect: "none", width: "100%" }}
                         indeterminate={!!pressTimeout && indeterminate}
@@ -78,7 +120,11 @@ export default ( { item, onUpdate, onDelete, pressTimeout }: ListItemProps ) =>
                         label={<Text underline={editMode}>{item.text}</Text>}
                     />}
             </Box>
-            <Button size="xs" variant="light" onClick={onToggleEdit} leftIcon={editMode ? <X /> : <Settings />}></Button>
+            <IconButton radius={20} color={theme.white} background={theme.colors.blue[ 6 ]} onClick={onToggleEdit}>
+                <Center>
+                    {editMode ? <X /> : <Settings />}
+                </Center>
+            </IconButton>
         </>
     );
 }

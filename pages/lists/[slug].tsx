@@ -1,4 +1,4 @@
-import { Center, Group, Space, Tabs, TextInput, UnstyledButton } from "@mantine/core";
+import { Center, Group, Space, Tabs, TextInput, useMantineTheme } from "@mantine/core";
 import { useNotifications } from "@mantine/notifications";
 import { observer } from "mobx-react-lite";
 import { GetServerSideProps } from "next";
@@ -7,6 +7,7 @@ import { useCallback, useRef, useState } from "react";
 import { useSwipeable } from "react-swipeable";
 import styled from "styled-components";
 import { Send } from "tabler-icons-react";
+import { IconButton } from "../../components/Controls/IconButton";
 import ListItem, { ListItemProps } from "../../components/List/ListItem";
 import { SortableList } from "../../components/List/Sortables";
 import { useSignal } from "../../hooks/useSignal";
@@ -84,15 +85,16 @@ export default observer( ( { list }: Props ) =>
 {
     const router = useRouter();
     const notifications = useNotifications();
+    const theme = useMantineTheme();
 
     const [ vm ] = useState( new ListViewModel( list ) );
 
-    const cb = useCallback( () =>
+    const onSignal = useCallback( () =>
     {
         vm.reloadItems();
     }, [ vm ] )
 
-    useSignal( "notification", `list_${list.slug}`, cb );
+    useSignal( "notification", `list_${list.slug}`, onSignal );
 
     const [ activeTab, setActiveTab ] = useState( 0 );
 
@@ -105,7 +107,7 @@ export default observer( ( { list }: Props ) =>
             console.log( eventData.dir );
             if ( eventData.dir === "Left" )
             {
-                setActiveTab( v => v == 0 ? ++v : v );
+                setActiveTab( v => v === 0 ? ++v : v );
             }
             else if ( eventData.dir === "Right" )
             {
@@ -196,11 +198,11 @@ export default observer( ( { list }: Props ) =>
                             required
                             autoFocus
                         ></TextInput>
-                        <UnstyledButton type="submit" style={{ background: "#228be6", borderRadius: "20px" }}>
+                        <IconButton radius={20} color={theme.white} background={theme.colors.blue[ 6 ]} type="submit">
                             <Center>
                                 <Send color={"white"}></Send>
                             </Center>
-                        </UnstyledButton>
+                        </IconButton>
                     </form>
                 </Tabs.Tab>
                 <Tabs.Tab label="Fertig">

@@ -30,7 +30,8 @@
     "react-swipeable": "^6.2.1",
     "slugify": "^1.6.5",
     "styled-components": "^5.3.3",
-    "tabler-icons-react": "^1.40.0"
+    "tabler-icons-react": "^1.40.0",
+    "use-debounce": "^7.0.1"
   },
   "devDependencies": {
     "@types/js-cookie": "^3.0.1",

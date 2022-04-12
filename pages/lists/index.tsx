@@ -1,10 +1,11 @@
-import { Box, Button, Group, ScrollArea, Space } from "@mantine/core";
+import { Box, Center, Group, ScrollArea, Space, useMantineTheme } from "@mantine/core";
 import { useNotifications } from "@mantine/notifications";
 import { GetServerSideProps } from "next";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import { Plus } from 'tabler-icons-react';
+import { IconButton } from "../../components/Controls/IconButton";
 import NewList from "../../components/List/NewList";
 import { List } from "../../lib/interfaces/list";
 import ListService from "../../services/listService";
@@ -42,6 +43,7 @@ export default ( props: Props ) =>
 {
     const router = useRouter();
     const notifications = useNotifications();
+    const theme = useMantineTheme();
 
     const [ openDialog, setOpenDialog ] = useState( false );
     const [ lists, setLists ] = useState<List[]>( props.lists );
@@ -102,9 +104,11 @@ export default ( props: Props ) =>
                 display: "flex",
                 justifyContent: "flex-end"
             }}>
-                <Button onClick={onDialogOpen} radius={20}>
-                    <Plus></Plus>
-                </Button>
+                <IconButton radius={40} color={theme.white} background={theme.colors.blue[ 6 ]} onClick={onDialogOpen}>
+                    <Center>
+                        <Plus></Plus>
+                    </Center>
+                </IconButton>
             </Box>
             {openDialog && <NewList onClose={onDialogClose} onCreate={onCreate}></NewList>}
         </>

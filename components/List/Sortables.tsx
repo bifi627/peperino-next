@@ -21,6 +21,7 @@ const ItemBox = styled.div`
     flex-direction: row;
     width: 100%;
     gap: 20px;
+    align-items: center;
 `;
 
 export const SortableListItem = SortableElement( ( props: ListItemProps ) =>
