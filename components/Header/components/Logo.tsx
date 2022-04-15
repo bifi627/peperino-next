@@ -20,7 +20,7 @@ const LogoBox = styled.div`
     user-select: none;
 `;
 
-export default ( props: Props ) =>
+export const Logo = ( props: Props ) =>
 {
     return (
         <LogoBox>

@@ -2,17 +2,23 @@ import { Group } from "@mantine/core";
 import { SortableContainer, SortableElement, SortableHandle } from "react-sortable-hoc";
 import styled from "styled-components";
 import { Menu } from "tabler-icons-react";
-import ListItem, { ListItemProps } from "./ListItem";
+
 interface Props
 {
-    itemProps: ListItemProps[]
+    children: React.ReactNode;
 }
+
+const StyledGroup = styled( Group )`
+    max-width: 90vw;
+    gap: 10px;
+`;
+
 export const SortableList = SortableContainer( ( props: Props ) =>
 {
     return (
-        <Group direction="column" style={{ maxWidth: "90vw", gap: "10px" }}>
-            {props.itemProps.map( ( p, index ) => <SortableListItem index={index} key={p.item.id} {...p}></SortableListItem> )}
-        </Group>
+        <StyledGroup direction="column">
+            {props.children}
+        </StyledGroup>
     );
 } );
 
@@ -24,12 +30,18 @@ const ItemBox = styled.div`
     align-items: center;
 `;
 
-export const SortableListItem = SortableElement( ( props: ListItemProps ) =>
+interface ItemProps
+{
+    children: React.ReactNode;
+    showDragHandle?: boolean;
+}
+
+export const SortableListItem = SortableElement( ( props: ItemProps ) =>
 {
     return (
         <ItemBox>
-            <DragHandle />
-            <ListItem {...props}></ListItem>
+            {props.showDragHandle && <DragHandle />}
+            {props.children}
         </ItemBox>
     );
 } );

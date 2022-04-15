@@ -1,12 +1,12 @@
-import { Burger, Header, MediaQuery } from "@mantine/core";
+import { Burger, Header as MantineHeader, MediaQuery } from "@mantine/core";
 import Link from "next/link";
 import styled from "styled-components";
-import useUser from "../../hooks/useUser";
+import { useUser } from "../../hooks/useUser";
 import { KnownRoutes } from "../../shared/knownRoutes";
-import AuthCheck from "../AuthCheck";
-import Login from "./components/Login";
-import Logo from "./components/Logo";
-import Profile from "./components/Profile";
+import { AuthCheck } from "../AuthCheck";
+import { Login } from "./components/Login";
+import { Logo } from "./components/Logo";
+import { Profile } from "./components/Profile";
 
 interface Props
 {
@@ -20,12 +20,12 @@ const HeaderBox = styled.div`
     justify-content: space-between;
 `;
 
-export default ( { opened, setOpened }: Props ) =>
+export const Header = ( { opened, setOpened }: Props ) =>
 {
     const user = useUser();
 
     return (
-        <Header height={60} p="md">{
+        <MantineHeader height={60} p="md">{
             <HeaderBox>
                 <MediaQuery largerThan="sm" styles={{ display: 'none' }}>
                     <Burger
@@ -46,6 +46,7 @@ export default ( { opened, setOpened }: Props ) =>
                 </MediaQuery>
                 <AuthCheck fallback=
                     {
+                        // Render Login-Button if user is not logged in
                         <Link href={KnownRoutes.Login()}>
                             <a>
                                 <Login />
@@ -59,6 +60,6 @@ export default ( { opened, setOpened }: Props ) =>
                     </Link>
                 </AuthCheck>
             </HeaderBox>
-        }</Header>
+        }</MantineHeader>
     );
 }

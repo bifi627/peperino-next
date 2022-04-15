@@ -21,7 +21,7 @@ const ProfileBox = styled.div`
     user-select: none;
 `;
 
-export default ( props: Props ) =>
+export const Login = ( props: Props ) =>
 {
     return (
         <ProfileBox>

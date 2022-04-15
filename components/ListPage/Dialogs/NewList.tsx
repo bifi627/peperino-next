@@ -1,13 +1,14 @@
 import { Button, Group, Modal, Space, TextInput, useMantineTheme } from "@mantine/core";
 import { useForm } from "@mantine/form";
-import { List } from "../../lib/interfaces/list";
+import { List } from "../../../lib/interfaces/list";
 
 interface Props
 {
     onCreate: ( list: List ) => void;
     onClose: () => void;
 }
-export default ( { onCreate, onClose }: Props ) =>
+
+export const NewList = ( { onCreate, onClose }: Props ) =>
 {
     const theme = useMantineTheme();
 

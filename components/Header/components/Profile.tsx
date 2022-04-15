@@ -1,6 +1,6 @@
 import { Text } from "@mantine/core";
 import styled from "styled-components";
-import useUser from "../../../hooks/useUser";
+import { useUser } from "../../../hooks/useUser";
 
 interface Props
 {
@@ -21,7 +21,7 @@ const ProfileBox = styled.div`
     user-select: none;
 `;
 
-export default ( props: Props ) =>
+export const Profile = ( props: Props ) =>
 {
     const user = useUser();
 

@@ -3,7 +3,7 @@ import { useForm } from "@mantine/form";
 import { useNotifications } from "@mantine/notifications";
 import { useRouter } from "next/router";
 import React from "react";
-import UserService from "../../services/userService";
+import { useUserManagementService } from "../../hooks/services/useUserManagementService";
 import { KnownRoutes } from "../../shared/knownRoutes";
 
 interface Props
@@ -11,14 +11,16 @@ interface Props
 }
 
 let usernameNotAvailable = false;
-export default ( { }: Props ) =>
+
+const RegisterPage = ( props: Props ) =>
 {
     const router = useRouter();
     const theme = useMantineTheme();
     const notifications = useNotifications();
-    const userService = new UserService();
 
-    const form = useForm( {
+    const userManagementService = useUserManagementService();
+
+    const registerForm = useForm( {
         initialValues: {
             email: "",
             password: "",
@@ -43,30 +45,33 @@ export default ( { }: Props ) =>
     {
         e.preventDefault();
         e.stopPropagation();
+
         usernameNotAvailable = false;
 
-        const result = form.validate();
+        const result = registerForm.validate();
 
         if ( result.hasErrors === false )
         {
             try
             {
-                if ( !await userService.checkUsername( form.values.username ) )
+                const usernameAvailable = await userManagementService.checkUsername( registerForm.values.username );
+                if ( !usernameAvailable )
                 {
                     usernameNotAvailable = true;
                     throw new Error( "Benutzername nicht verfügbar!" );
                 }
-                const newUser = await userService.createNewUser( form.values.username, form.values.email, form.values.password );
+
+                const newUser = await userManagementService.createNewUser( registerForm.values.username, registerForm.values.email, registerForm.values.password );
 
                 if ( newUser )
                 {
-                    router.push( KnownRoutes.Login( form.values.email ) );
+                    router.push( KnownRoutes.Login( registerForm.values.email ) );
                 }
             }
             catch ( error: any )
             {
                 notifications.showNotification( { title: "Fehler", message: error.message, color: "red" } );
-                form.validateField( "username" );
+                registerForm.validateField( "username" );
             }
         }
     };
@@ -86,27 +91,27 @@ export default ( { }: Props ) =>
                     label="Email"
                     placeholder="Email"
                     type="email"
-                    {...form.getInputProps( "email" )} />
+                    {...registerForm.getInputProps( "email" )} />
                 <Space h="md" />
                 <PasswordInput
                     required
                     label="Passwort"
                     placeholder="Passwort"
                     type="password"
-                    {...form.getInputProps( "password" )} />
+                    {...registerForm.getInputProps( "password" )} />
                 <Space h="md" />
                 <PasswordInput
                     required
                     label="Passwort"
                     placeholder="Passwort wiederholen"
                     type="password"
-                    {...form.getInputProps( "password2" )} />
+                    {...registerForm.getInputProps( "password2" )} />
                 <Space h="md" />
                 <TextInput
                     required
                     label="Name"
                     placeholder="Benutzername"
-                    {...form.getInputProps( "username" )} />
+                    {...registerForm.getInputProps( "username" )} />
                 <Space h="xl" />
                 <Group position="center">
                     <Button type="submit">Registrieren</Button>
@@ -115,3 +120,5 @@ export default ( { }: Props ) =>
         </Modal>
     );
 }
+
+export default RegisterPage;

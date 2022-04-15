@@ -1,5 +1,5 @@
 import Link from "next/link";
-import useFirebaseUser from "../hooks/useUser";
+import { useUser } from "../hooks/useUser";
 import { KnownRoutes } from "../shared/knownRoutes";
 
 interface Props
@@ -9,9 +9,9 @@ interface Props
     hidden?: boolean;
 }
 
-export default ( props: Props ): JSX.Element =>
+export const AuthCheck = ( props: Props ): JSX.Element =>
 {
-    const user = useFirebaseUser();
+    const user = useUser();
 
     if ( user )
     {

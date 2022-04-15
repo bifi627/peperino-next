@@ -2,15 +2,15 @@ import { Center, Checkbox, Group, Text, TextInput, UnstyledButton, useMantineThe
 import { useState } from "react";
 import styled from "styled-components";
 import { Check, Loader, QuestionMark, Settings, Trash, X } from "tabler-icons-react";
-import useLongPress from "../../hooks/useLongPress";
-import { ListItem } from "../../lib/interfaces/list";
+import { useDebouncedCallback } from "use-debounce";
+import { ListItem } from "../../../lib/interfaces/list";
 
 export interface ListItemProps
 {
-    item: ListItem;
+    model: ListItem;
     onUpdate: ( item: ListItem ) => void;
     onDelete: ( item: ListItem ) => void;
-    pressTimeout?: number;
+    pressDelay?: number;
 }
 
 const Box = styled.div`
@@ -26,39 +26,25 @@ export const IconButton = styled( UnstyledButton ) <{ color: string, background:
     background: ${p => p.background};
 `;
 
-export default ( { item, onUpdate, onDelete, pressTimeout }: ListItemProps ) =>
+export const CheckableItem = ( { model, onUpdate, onDelete, pressDelay }: ListItemProps ) =>
 {
     const theme = useMantineTheme();
 
     const [ indeterminate, setIndeterminate ] = useState( false );
-    const [ timeoutId, setTimeoutId ] = useState<NodeJS.Timeout>();
-    const [ innerText, setInnerText ] = useState( item.text );
+    const [ innerText, setInnerText ] = useState( model.text );
+    const [ editMode, setEditMode ] = useState( false );
+    const [ confirmDelete, setConfirmDelete ] = useState( false );
 
-    const longDebounceDispatch = () =>
+    const debounceUpdate = useDebouncedCallback( () =>
     {
-        // If pending change, cancel
-        if ( timeoutId )
-        {
-            clearTimeout( timeoutId );
-            setTimeoutId( undefined );
-            setIndeterminate( false );
-        }
-        else
-        {
-            // Queue change
-            setTimeoutId( setTimeout( async () =>
-            {
-                item.checked = !item.checked;
-                onUpdate( item );
-            }, pressTimeout ?? 73 ) );
-            setIndeterminate( true );
-        }
-    }
+        model.checked = !model.checked;
+        onUpdate( model );
+    }, pressDelay ?? 73 );
 
     const onToggleEdit = () =>
     {
         setEditMode( e => !e );
-        setInnerText( item.text );
+        setInnerText( model.text );
 
         if ( confirmDelete === true )
         {
@@ -66,26 +52,27 @@ export default ( { item, onUpdate, onDelete, pressTimeout }: ListItemProps ) =>
         }
     }
 
-    const onClick = ( e: React.MouseEvent<HTMLElement, MouseEvent> | React.TouchEvent<HTMLElement> ) =>
+    const onCheck = ( e: React.MouseEvent<HTMLElement, MouseEvent> | React.TouchEvent<HTMLElement> ) =>
     {
-        !editMode && longDebounceDispatch();
+        if ( debounceUpdate.isPending() === false )
+        {
+            setIndeterminate( true );
+            !editMode && debounceUpdate();
+        }
+        else
+        {
+            setIndeterminate( false );
+            debounceUpdate.cancel();
+        }
     }
-    const [ editMode, setEditMode ] = useState( false );
-
-    const [ confirmDelete, setConfirmDelete ] = useState( false );
-
-    const o = useLongPress( e =>
-    {
-        setEditMode( true );
-    }, e => { } );
 
     return (
         <>
-            <Box key={item.id}>
+            <Box>
                 {editMode ?
                     <Group sx={{ width: "100%", flexWrap: "nowrap" }} direction="row">
                         <TextInput sx={{ width: "100%" }} autoFocus value={innerText} size="xs" onChange={e => setInnerText( e.currentTarget.value )}></TextInput>
-                        <IconButton radius={20} color={theme.white} background={theme.colors.green[ 6 ]} onClick={() => { setEditMode( false ); onUpdate( { ...item, text: innerText } ) }}>
+                        <IconButton radius={20} color={theme.white} background={theme.colors.green[ 6 ]} onClick={() => { setEditMode( false ); onUpdate( { ...model, text: innerText } ) }}>
                             <Center>
                                 <Check />
                             </Center>
@@ -96,7 +83,7 @@ export default ( { item, onUpdate, onDelete, pressTimeout }: ListItemProps ) =>
                             {
                                 setEditMode( false );
                                 setConfirmDelete( false );
-                                onDelete( item );
+                                onDelete( model );
                             }
                             else
                             {
@@ -110,14 +97,14 @@ export default ( { item, onUpdate, onDelete, pressTimeout }: ListItemProps ) =>
                     </Group>
                     :
                     <Checkbox
-                        onClick={onClick}
+                        onClick={onCheck}
                         icon={( { indeterminate, className } ) => indeterminate ? <Loader className={className} /> : <Check className={className} />}
                         style={{ maxWidth: "90vw", overflow: "hidden", userSelect: "none", width: "100%" }}
-                        indeterminate={!!pressTimeout && indeterminate}
+                        indeterminate={indeterminate}
                         size="md"
-                        checked={item.checked}
+                        checked={model.checked}
                         onChange={e => e}
-                        label={<Text underline={editMode}>{item.text}</Text>}
+                        label={<Text>{model.text}</Text>}
                     />}
             </Box>
             <IconButton radius={20} color={theme.white} background={theme.colors.blue[ 6 ]} onClick={onToggleEdit}>

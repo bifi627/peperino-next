@@ -1,6 +1,11 @@
 import { UnstyledButton } from "@mantine/core";
 import styled from "styled-components";
 
+export const ScrollBox = styled.div`
+    max-height: calc(100vh - 350px);
+    overflow: auto;
+`;
+
 export const IconButton = styled( UnstyledButton ) <{ color: string, background: string, radius?: number }>`
     width: 36px;
     height: 36px;

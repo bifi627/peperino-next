@@ -1,6 +1,6 @@
 import { BACKEND_URL } from "../shared/constants";
 
-export type Endpoint = "user" | "list" | "config";
+export type Endpoint = "userManagement" | "list" | "config";
 
 export type Hub = "notification";
 

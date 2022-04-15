@@ -3,9 +3,11 @@ import { useNotifications } from "@mantine/notifications";
 import { getAuth, signOut } from "firebase/auth";
 import { GetServerSideProps } from "next";
 import { useRouter } from "next/router";
-import useUser from "../../hooks/useUser";
+import styled from "styled-components";
+import { useUserManagementService } from "../../hooks/services/useUserManagementService";
+import { useUser } from "../../hooks/useUser";
 import { User } from "../../lib/interfaces/user";
-import UserService from "../../services/userService";
+import UserManagementService from "../../services/userManagementService";
 import { AUTH_TOKEN_COOKIE_NAME } from "../../shared/constants";
 import { KnownRoutes } from "../../shared/knownRoutes";
 
@@ -19,6 +21,8 @@ export const getServerSideProps: GetServerSideProps<Props> = async ( context ) =
 {
     const username = context.params?.username;
 
+    const anonymouseUserService = new UserManagementService();
+
     if ( !username || Array.isArray( username ) )
     {
         return {
@@ -27,7 +31,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async ( context ) =
         }
     }
 
-    if ( await new UserService().checkUsername( username ) === true )
+    if ( await anonymouseUserService.checkUsername( username ) === true )
     {
         return {
             props: {} as Props,
@@ -48,21 +52,32 @@ export const getServerSideProps: GetServerSideProps<Props> = async ( context ) =
         }
     }
 
-    const user = await new UserService( token ).getUserByUsername( username );
-    const currentUser = await new UserService( token ).getCurrentUser();
+    const userService = new UserManagementService( token );
+
+    const user = await userService.getUserByUsername( username );
+    const currentUser = await userService.getCurrentUser();
+
     return {
         props: { user: user, isSelf: user.externalId.toLowerCase() === currentUser.externalId.toLowerCase() }
     }
 }
 
-export default ( props: Props ) =>
+const Box = styled.div`
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+`;
+
+const ProfilePage = ( props: Props ) =>
 {
     const router = useRouter();
     const user = useUser();
     const notifications = useNotifications();
 
+    const userManagementService = useUserManagementService();
+
     return (
-        <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+        <Box>
             {props.isSelf && <Button onClick={async () =>
             {
                 signOut( getAuth() );
@@ -77,7 +92,7 @@ export default ( props: Props ) =>
                 {
                     try
                     {
-                        await new UserService().deleteUser( user.peperinoUser );
+                        await userManagementService.deleteUser( user.peperinoUser );
                         signOut( getAuth() );
                         await router.push( KnownRoutes.Root() );
                     }
@@ -87,6 +102,7 @@ export default ( props: Props ) =>
                     }
                 }
             }}>LÖSCHEN</Button>}
-        </div>
+        </Box>
     );
 }
+export default ProfilePage;

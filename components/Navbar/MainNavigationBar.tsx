@@ -1,10 +1,10 @@
 import { MediaQuery, Navbar, ScrollArea, Text } from "@mantine/core";
 import { useNotifications } from "@mantine/notifications";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import ConfigService from "../../services/configService";
 import { KnownRoutes } from "../../shared/knownRoutes";
-import Logo from "../Header/components/Logo";
+import { Logo } from "../Header/components/Logo";
 import { NavigationItem } from "./NavigationItem";
 
 interface Props
@@ -14,13 +14,13 @@ interface Props
     navigationItems: NavigationItem[];
 }
 
-export default ( { opened, setOpened, navigationItems }: Props ) =>
+export const MainNavigationBar = ( { opened, setOpened, navigationItems }: Props ) =>
 {
     const notifications = useNotifications();
 
     const [ isAlive, setIsAlive ] = useState( false );
 
-    const checkServerState = async () =>
+    const checkServerState = useCallback( async () =>
     {
         try
         {
@@ -32,12 +32,12 @@ export default ( { opened, setOpened, navigationItems }: Props ) =>
             notifications.showNotification( { title: "Fehler", message: error.message, color: "red" } );
             setIsAlive( false )
         }
-    }
+    }, [ notifications ] )
 
     useEffect( () =>
     {
         checkServerState();
-    }, [] );
+    }, [ checkServerState ] );
 
     return (
         <Navbar hidden={!opened} hiddenBreakpoint="sm" p="xs" width={{ base: 300 }}>

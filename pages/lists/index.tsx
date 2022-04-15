@@ -5,8 +5,8 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import { Plus } from 'tabler-icons-react';
-import { IconButton } from "../../components/Controls/IconButton";
-import NewList from "../../components/List/NewList";
+import { NewList } from "../../components/ListPage/Dialogs/NewList";
+import { IconButton } from "../../components/ListPage/_styles";
 import { List } from "../../lib/interfaces/list";
 import ListService from "../../services/listService";
 import { AUTH_TOKEN_COOKIE_NAME } from "../../shared/constants";
@@ -39,7 +39,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async ( context ) =
     }
 }
 
-export default ( props: Props ) =>
+const Page = ( props: Props ) =>
 {
     const router = useRouter();
     const notifications = useNotifications();
@@ -64,11 +64,7 @@ export default ( props: Props ) =>
         {
             const createdList = await new ListService().createList( newList.name )
             notifications.showNotification( { title: "Neu", message: "Neue Liste wurde erstellt", color: "green", autoClose: true } );
-            setLists( prev =>
-            {
-                prev.push( createdList )
-                return prev;
-            } );
+            setLists( [ ...lists, createdList ] )
         }
         catch ( error: any )
         {
@@ -114,3 +110,5 @@ export default ( props: Props ) =>
         </>
     );
 }
+
+export default Page;

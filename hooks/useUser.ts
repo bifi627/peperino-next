@@ -2,7 +2,7 @@ import { getAuth, User } from "firebase/auth";
 import { useEffect, useState } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { User as PeperinoUser } from "../lib/interfaces/user";
-import UserService from "../services/userService";
+import { useUserManagementService } from "./services/useUserManagementService";
 
 interface UserState
 {
@@ -10,10 +10,11 @@ interface UserState
     peperinoUser?: PeperinoUser;
 }
 
-export default () =>
+export const useUser = () =>
 {
-    const [ userState, setUserState ] = useState<UserState | undefined>( undefined );
+    const userManagementService = useUserManagementService();
 
+    const [ userState, setUserState ] = useState<UserState | undefined>( undefined );
     const [ user ] = useAuthState( getAuth() );
 
     useEffect( () =>
@@ -24,7 +25,7 @@ export default () =>
             {
                 try
                 {
-                    const peperinoUser = await new UserService().getCurrentUser();
+                    const peperinoUser = await userManagementService.getCurrentUser();
                     if ( peperinoUser )
                     {
                         setUserState( { firebaseUser: user, peperinoUser: peperinoUser } )
@@ -40,7 +41,7 @@ export default () =>
                 setUserState( undefined );
             }
         } )();
-    }, [ user ] );
+    }, [ user, userManagementService ] );
 
     return userState;
 };

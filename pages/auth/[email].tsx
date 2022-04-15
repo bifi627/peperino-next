@@ -1,20 +1,22 @@
 import { Button, Group, Modal, PasswordInput, Space, Text, TextInput, useMantineTheme } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useNotifications } from "@mantine/notifications";
-import { getAuth, GoogleAuthProvider, signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
+import { GoogleAuthProvider } from "firebase/auth";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
 import { BrandGoogle } from 'tabler-icons-react';
-import UserService from "../../services/userService";
+import { useUserManagementService } from "../../hooks/services/useUserManagementService";
 import { KnownRoutes } from "../../shared/knownRoutes";
 
 interface Props
 {
 }
 
-export default ( props: Props ) =>
+const LoginPage = ( props: Props ) =>
 {
+    const userManagementService = useUserManagementService();
+
     const router = useRouter();
     const notifications = useNotifications();
 
@@ -63,7 +65,7 @@ export default ( props: Props ) =>
         {
             try
             {
-                await signInWithEmailAndPassword( getAuth(), form.values.email, form.values.password );
+                await userManagementService.firebaseConnector.signInWithEmailAndPassword( form.values.email, form.values.password );
                 moveBack();
             }
             catch ( error: any )
@@ -77,8 +79,8 @@ export default ( props: Props ) =>
     {
         try
         {
-            const result = await signInWithPopup( getAuth(), new GoogleAuthProvider() );
-            const user = await new UserService().handleProviderLogin( { username: result.user.email ?? "???", externalId: result.user.uid } );
+            const result = await userManagementService.firebaseConnector.signInWithPopup( new GoogleAuthProvider() );
+            const user = await userManagementService.handleProviderLogin( { username: result.user.email ?? "???", externalId: result.user.uid } );
             if ( user )
             {
                 moveBack();
@@ -126,6 +128,8 @@ export default ( props: Props ) =>
                     <Button onClick={onGoogleLogin} leftIcon={<BrandGoogle></BrandGoogle>}>Google</Button>
                 </Group>
             </form>
-        </Modal >
+        </Modal>
     );
 }
+
+export default LoginPage;
