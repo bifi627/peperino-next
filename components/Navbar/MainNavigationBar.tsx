@@ -1,44 +1,17 @@
-import { MediaQuery, Navbar, ScrollArea, Text } from "@mantine/core";
-import { useNotifications } from "@mantine/notifications";
+import { MediaQuery, Navbar, ScrollArea } from "@mantine/core";
 import Link from "next/link";
-import { useCallback, useEffect, useState } from "react";
-import ConfigService from "../../services/configService";
 import { KnownRoutes } from "../../shared/knownRoutes";
 import { Logo } from "../Header/components/Logo";
-import { NavigationItem } from "./NavigationItem";
 
 interface Props
 {
     opened: boolean;
     setOpened: React.Dispatch<React.SetStateAction<boolean>>;
-    navigationItems: NavigationItem[];
+    children: React.ReactNode;
 }
 
-export const MainNavigationBar = ( { opened, setOpened, navigationItems }: Props ) =>
+export const MainNavigationBar = ( { opened, setOpened, children }: Props ) =>
 {
-    const notifications = useNotifications();
-
-    const [ isAlive, setIsAlive ] = useState( false );
-
-    const checkServerState = useCallback( async () =>
-    {
-        try
-        {
-            const alive = await new ConfigService().check()
-            setIsAlive( alive );
-        }
-        catch ( error: any )
-        {
-            notifications.showNotification( { title: "Fehler", message: error.message, color: "red" } );
-            setIsAlive( false )
-        }
-    }, [ notifications ] )
-
-    useEffect( () =>
-    {
-        checkServerState();
-    }, [ checkServerState ] );
-
     return (
         <Navbar hidden={!opened} hiddenBreakpoint="sm" p="xs" width={{ base: 300 }}>
             <MediaQuery largerThan={"sm"} styles={{ display: 'none' }}>
@@ -55,26 +28,10 @@ export const MainNavigationBar = ( { opened, setOpened, navigationItems }: Props
                 </div>
             </MediaQuery>
             <Navbar.Section grow component={ScrollArea} mx="-xs" px="xs">
-                {navigationItems.map( item =>
-                {
-                    return (
-                        <Navbar.Section key={item.title} mt="xs">{
-                            <Link href={item.route} passHref>
-                                <Text onClick={() =>
-                                {
-                                    setOpened( false );
-                                }} component="a">{item.title}</Text>
-                            </Link>
-                        }</Navbar.Section>
-                    );
-                } )}
+                {children}
             </Navbar.Section>
 
             <Navbar.Section>{
-                <Text onClick={async () =>
-                {
-                    await checkServerState();
-                }}>{isAlive ? "alive" : "dead"}</Text>
             }</Navbar.Section>
         </Navbar>
     );

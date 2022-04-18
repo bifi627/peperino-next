@@ -1,5 +1,5 @@
 import { observer } from "mobx-react";
-import { useListState } from "../../../hooks/state/useListState";
+import { useListContext } from "../../../hooks/store/useListStore";
 import { SortableListItem } from "../../Sortables";
 import { CheckableItem } from "../CheckList/CheckItem";
 import { SortableCheckList } from "../CheckList/SortableCheckList";
@@ -7,7 +7,7 @@ import { ScrollBox } from "../_styles";
 
 export const FinishedTab = observer( () =>
 {
-    const viewModel = useListState();
+    const viewModel = useListContext();
 
     return (
         <ScrollBox>

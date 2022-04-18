@@ -4,7 +4,7 @@ import { observer } from "mobx-react";
 import { useRouter } from "next/router";
 import { useRef } from "react";
 import { Plus } from "tabler-icons-react";
-import { useListState } from "../../../hooks/state/useListState";
+import { useListContext } from "../../../hooks/store/useListStore";
 import { SortableListItem } from "../../Sortables";
 import { CheckableItem } from "../CheckList/CheckItem";
 import { SortableCheckList } from "../CheckList/SortableCheckList";
@@ -16,7 +16,7 @@ interface Props
 
 export const OpenTab = observer( ( props: Props ) =>
 {
-    const viewModel = useListState();
+    const viewModel = useListContext();
     const theme = useMantineTheme();
 
     const notifications = useNotifications();

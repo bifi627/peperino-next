@@ -1,12 +1,12 @@
 import { observer } from "mobx-react";
-import { useListState } from "../../hooks/state/useListState";
+import { useListContext } from "../../hooks/store/useListStore";
 
 export const Header = observer( () =>
 {
-    const viewModel = useListState();
+    const viewModel = useListContext();
     return (
         <>
-            {viewModel.name} - {viewModel.slug} - {viewModel.listItems.length}
+            {viewModel.name} - {viewModel.slug} - {viewModel.listItems.length} - {viewModel.ConnectionState}
         </>
     );
 } );

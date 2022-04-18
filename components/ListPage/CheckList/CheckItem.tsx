@@ -1,13 +1,15 @@
 import { Center, Checkbox, Group, Text, TextInput, UnstyledButton, useMantineTheme } from "@mantine/core";
+import { observer } from "mobx-react";
 import { useState } from "react";
 import styled from "styled-components";
 import { Check, Loader, QuestionMark, Settings, Trash, X } from "tabler-icons-react";
 import { useDebouncedCallback } from "use-debounce";
 import { ListItem } from "../../../lib/interfaces/list";
+import { ListItemViewModel } from "../../../store/list/ListItemViewModel";
 
 export interface ListItemProps
 {
-    model: ListItem;
+    model: ListItemViewModel;
     onUpdate: ( item: ListItem ) => void;
     onDelete: ( item: ListItem ) => void;
     pressDelay?: number;
@@ -26,7 +28,7 @@ export const IconButton = styled( UnstyledButton ) <{ color: string, background:
     background: ${p => p.background};
 `;
 
-export const CheckableItem = ( { model, onUpdate, onDelete, pressDelay }: ListItemProps ) =>
+export const CheckableItem = observer( ( { model, onUpdate, onDelete, pressDelay }: ListItemProps ) =>
 {
     const theme = useMantineTheme();
 
@@ -72,7 +74,12 @@ export const CheckableItem = ( { model, onUpdate, onDelete, pressDelay }: ListIt
                 {editMode ?
                     <Group sx={{ width: "100%", flexWrap: "nowrap" }} direction="row">
                         <TextInput sx={{ width: "100%" }} autoFocus value={innerText} size="xs" onChange={e => setInnerText( e.currentTarget.value )}></TextInput>
-                        <IconButton radius={20} color={theme.white} background={theme.colors.green[ 6 ]} onClick={() => { setEditMode( false ); onUpdate( { ...model, text: innerText } ) }}>
+                        <IconButton radius={20} color={theme.white} background={theme.colors.green[ 6 ]} onClick={() =>
+                        {
+                            setEditMode( false );
+                            model.text = innerText;
+                            onUpdate( model );
+                        }}>
                             <Center>
                                 <Check />
                             </Center>
@@ -114,4 +121,4 @@ export const CheckableItem = ( { model, onUpdate, onDelete, pressDelay }: ListIt
             </IconButton>
         </>
     );
-}
+} );

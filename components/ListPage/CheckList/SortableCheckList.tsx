@@ -1,4 +1,4 @@
-import { useListState } from "../../../hooks/state/useListState";
+import { useListContext } from "../../../hooks/store/useListStore";
 import { SortableList } from "../../Sortables";
 
 interface Props
@@ -8,7 +8,7 @@ interface Props
 
 export const SortableCheckList = ( props: Props ) =>
 {
-    const listViewModel = useListState();
+    const listViewModel = useListContext();
 
     const onSortEnd = async ( { oldIndex, newIndex }: { oldIndex: number, newIndex: number } ) =>
     {

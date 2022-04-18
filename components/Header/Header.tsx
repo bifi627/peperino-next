@@ -1,4 +1,5 @@
 import { Burger, Header as MantineHeader, MediaQuery } from "@mantine/core";
+import { observer } from "mobx-react";
 import Link from "next/link";
 import styled from "styled-components";
 import { useUser } from "../../hooks/useUser";
@@ -20,7 +21,7 @@ const HeaderBox = styled.div`
     justify-content: space-between;
 `;
 
-export const Header = ( { opened, setOpened }: Props ) =>
+export const Header = observer( ( { opened, setOpened }: Props ) =>
 {
     const user = useUser();
 
@@ -62,4 +63,4 @@ export const Header = ( { opened, setOpened }: Props ) =>
             </HeaderBox>
         }</MantineHeader>
     );
-}
+} );

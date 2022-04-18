@@ -1,15 +1,15 @@
 import { Tabs } from "@mantine/core";
 import { observer } from "mobx-react-lite";
 import { GetServerSideProps } from "next";
-import { useCallback, useState } from "react";
+import { useState } from "react";
 import { useSwipeable } from "react-swipeable";
 import styled from "styled-components";
 import { Header } from "../../components/ListPage/Header";
 import { FinishedTab } from "../../components/ListPage/Tabs/FinishedTab";
 import { OpenTab } from "../../components/ListPage/Tabs/OpenTab";
 import { useListService } from "../../hooks/services/useListService";
-import { ListContext, useInitListState } from "../../hooks/state/useListState";
-import { useSignal } from "../../hooks/useSignal";
+import { ListContext, useListStore } from "../../hooks/store/useListStore";
+import { useUser } from "../../hooks/useUser";
 import { List } from "../../lib/interfaces/list";
 import ListService from "../../services/listService";
 import { AUTH_TOKEN_COOKIE_NAME } from "../../shared/constants";
@@ -63,27 +63,24 @@ export const getServerSideProps: GetServerSideProps<Props> = async ( context ) =
     }
 }
 
-const ItemBox = styled.div`
-    display: flex;
-    flex-direction: row;
-    width: 100%;
-    gap: 20px;
-    padding-left: 40px;
-`;
-
 const SwipeBox = styled.div`
     height: calc(100vh - 150px);
 `;
 
 export default observer( ( { list }: Props ) =>
 {
+    const user = useUser();
     const listService = useListService();
-    const viewModel = useInitListState( list, listService );
 
-    useSignal( "notification", `list_${list.slug}`, useCallback( () =>
-    {
-        viewModel.reloadItems();
-    }, [ viewModel ] ) );
+    const listViewModel = useListStore(
+        {
+            data: list
+        },
+        {
+            listService: listService,
+            externalId: user?.firebaseUser.uid ?? ""
+        }
+    );
 
     const [ activeTab, setActiveTab ] = useState( 0 );
 
@@ -103,7 +100,7 @@ export default observer( ( { list }: Props ) =>
     } );
 
     return (
-        <ListContext.Provider value={viewModel}>
+        <ListContext.Provider value={listViewModel}>
             <SwipeBox {...handlers}>
                 <Header></Header>
                 <Tabs grow position="apart" active={activeTab} onTabChange={setActiveTab}>

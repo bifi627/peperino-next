@@ -2,7 +2,7 @@ import { BACKEND_URL } from "../shared/constants";
 
 export type Endpoint = "userManagement" | "list" | "config";
 
-export type Hub = "notification";
+export type Hub = "list";
 
 export type RequestMethod = "POST" | "GET" | "PUT" | "DELETE";
 
@@ -20,6 +20,6 @@ export module ApiHelper
 
     export const getHubRoute = ( hub: Hub ) =>
     {
-        return getBaseRoute() + hub;
+        return getBaseRoute() + "signalr/" + hub;
     }
 }

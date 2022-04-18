@@ -11,7 +11,6 @@ export interface ListItem
     text: string;
     checked: boolean;
     type: ItemType;
-    wait: boolean;
 }
 
 export enum ItemType

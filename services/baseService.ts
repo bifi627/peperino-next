@@ -124,7 +124,8 @@ export class BaseService
         }
         else
         {
-            console.error( response );
+            const error = await response.text();
+            console.error( error );
             throw new NetworkError( response );
         }
     }
