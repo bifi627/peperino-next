@@ -10,10 +10,11 @@ export class ListViewModel implements List
 {
     private readonly listService: ListService;
 
-    public readonly externalUserId: string;
-
     public readonly name: string;
     public readonly slug: string;
+    public readonly description: string;
+    public readonly ownerName: string;
+    public readonly created: string;
 
     @observable
     public readonly listItems: ListItemViewModel[] = [];
@@ -30,7 +31,7 @@ export class ListViewModel implements List
         return this.listItems.filter( item => item.checked === false )
     }
 
-    private readonly notificationHubConnection: HubConnection;
+    private notificationHubConnection!: HubConnection;
 
     @observable
     private _connectionState: HubConnectionState = HubConnectionState.Disconnected;
@@ -39,21 +40,17 @@ export class ListViewModel implements List
         return this._connectionState;
     }
 
-    constructor( data: List, listService: ListService, externalUserId: string )
+    constructor( data: List, listService: ListService )
     {
         this.listService = listService;
-        this.externalUserId = externalUserId;
 
         this.name = data.name;
         this.slug = data.slug;
+        this.description = data.description;
+        this.ownerName = data.ownerName;
+        this.created = data.created;
 
         this.updateDataFromModel( ...data.listItems );
-
-        this.notificationHubConnection = new HubConnectionBuilder().withUrl( ApiHelper.getHubRoute( "list" ),
-            {
-                skipNegotiation: true,
-                transport: HttpTransportType.WebSockets,
-            } ).withAutomaticReconnect().build();
 
         makeObservable( this );
     }
@@ -74,15 +71,22 @@ export class ListViewModel implements List
         } );
     }
 
-    public async initNotifications()
+    public async initNotifications( user: string )
     {
+        this.notificationHubConnection = new HubConnectionBuilder().withUrl( ApiHelper.getHubRoute( "list" ),
+            {
+                skipNegotiation: true,
+                transport: HttpTransportType.WebSockets,
+            } ).withAutomaticReconnect().build();
+
         this.registerWebSocketEvents();
 
         this.notificationHubConnection.on( "Update", async ( sender: string ) =>
         {
-            if ( this.externalUserId !== sender )
+            // if ( user !== sender )
             {
                 await this.reloadItems();
+                this._connectionState = this.notificationHubConnection.state;
             }
         } );
 
@@ -126,7 +130,9 @@ export class ListViewModel implements List
         if ( isObservableArray( this.listItems ) )
         {
             const list = await this.listService.getBySlug( this.slug );
-            this.updateDataFromModel( ...list.listItems );
+            this.listItems.replace( list.listItems.map( ( item => new ListItemViewModel( item ) ) ) );
+
+            // this.updateDataFromModel( ...list.listItems );
         }
     }
 
@@ -156,6 +162,7 @@ export class ListViewModel implements List
     {
         if ( isObservableArray( this.listItems ) )
         {
+            // TODO: Implement index property --> the ui should not depend on the actual array positions
             this.listItems.replace( [ ...arrayMoveImmutable( this.listItems.filter( i => i.checked === false ), oldIndex, newIndex ), ...this.listItems.filter( i => i.checked === true ) ] )
         }
 

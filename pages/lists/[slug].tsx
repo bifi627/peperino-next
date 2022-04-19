@@ -1,7 +1,7 @@
 import { Tabs } from "@mantine/core";
 import { observer } from "mobx-react-lite";
 import { GetServerSideProps } from "next";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useSwipeable } from "react-swipeable";
 import styled from "styled-components";
 import { Header } from "../../components/ListPage/Header";
@@ -18,7 +18,7 @@ import { NetworkError } from "../../shared/networkError";
 
 interface Props
 {
-    list: List;
+    data: List;
 }
 
 export const getServerSideProps: GetServerSideProps<Props> = async ( context ) =>
@@ -43,7 +43,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async ( context ) =
         var list = await new ListService( token ).getBySlug( slug );
 
         return {
-            props: { list: list }
+            props: { data: list }
         }
     }
     catch ( error )
@@ -67,20 +67,24 @@ const SwipeBox = styled.div`
     height: calc(100vh - 150px);
 `;
 
-export default observer( ( { list }: Props ) =>
+export default observer( ( { data }: Props ) =>
 {
+    const list = useMemo( () => data, [ data ] );
+
     const user = useUser();
     const listService = useListService();
 
-    const listViewModel = useListStore(
-        {
-            data: list
-        },
-        {
-            listService: listService,
-            externalId: user?.firebaseUser.uid ?? ""
-        }
-    );
+    const listViewModel = useListStore( list, listService, user?.firebaseUser.uid ?? "" );
+
+    // const listViewModel = useListStore(
+    //     {
+    //         data: list
+    //     },
+    //     {
+    //         listService: listService,
+    //         externalId: user?.firebaseUser.uid ?? ""
+    //     }
+    // );
 
     const [ activeTab, setActiveTab ] = useState( 0 );
 

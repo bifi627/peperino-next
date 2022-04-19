@@ -12,11 +12,11 @@ export const FinishedTab = observer( () =>
     return (
         <ScrollBox>
             <SortableCheckList>
-                {viewModel.checkedItems.map( ( item, index ) =>
+                {viewModel.listItems.filter( item => item.checked === true ).map( ( item, index ) =>
                 {
                     return (
                         <SortableListItem key={item.id} index={index}>
-                            <CheckableItem key={item.id} model={item} onDelete={() => viewModel.deleteItem( item )} onUpdate={() => viewModel.updateItem( item )}></CheckableItem>
+                            <CheckableItem model={item} onDelete={() => viewModel.deleteItem( item )} onUpdate={() => viewModel.updateItem( item )}></CheckableItem>
                         </SortableListItem>
                     );
                 } )}

@@ -1,4 +1,4 @@
-import { action, observable } from "mobx";
+import { action, makeObservable, observable } from "mobx";
 import { ItemType, ListItem } from "../../lib/interfaces/list";
 
 export class ListItemViewModel implements ListItem
@@ -20,6 +20,8 @@ export class ListItemViewModel implements ListItem
         this.id = data.id;
 
         this.updateFromModel( data );
+
+        makeObservable( this );
     }
 
     @action

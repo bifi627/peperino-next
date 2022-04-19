@@ -2,6 +2,9 @@ export interface List
 {
     name: string;
     slug: string;
+    description: string;
+    ownerName: string;
+    created: string; // ISO String
     listItems: ListItem[];
 }
 

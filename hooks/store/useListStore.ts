@@ -1,4 +1,5 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { HubConnectionState } from "@microsoft/signalr";
+import { createContext, useContext, useEffect, useMemo } from "react";
 import { List } from "../../lib/interfaces/list";
 import ListService from "../../services/listService";
 import { ListViewModel } from "../../store/list/ListViewModel";
@@ -16,18 +17,25 @@ interface Depenencies
     externalId: string;
 }
 
-export const useListStore = ( init: ListInit, depenencies: Depenencies ) =>
+export const useListStore = ( list: List, listService: ListService, externalId: string ) =>
 {
-    const [ listState ] = useState( new ListViewModel( init.data, depenencies.listService, depenencies.externalId ) );
+    const listState = useMemo( () => new ListViewModel( list, listService ), [ list, listService ] );
 
     useEffect( () =>
     {
-        listState.initNotifications();
+        if ( externalId )
+        {
+            listState.initNotifications( externalId );
+        }
+
         return () =>
         {
-            listState.dispose();
+            if ( listState.ConnectionState !== HubConnectionState.Disconnected )
+            {
+                listState.dispose();
+            }
         }
-    }, [ listState ] )
+    }, [ externalId ] );
 
     return listState;
 }

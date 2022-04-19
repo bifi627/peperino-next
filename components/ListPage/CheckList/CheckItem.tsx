@@ -2,16 +2,15 @@ import { Center, Checkbox, Group, Text, TextInput, UnstyledButton, useMantineThe
 import { observer } from "mobx-react";
 import { useState } from "react";
 import styled from "styled-components";
-import { Check, Loader, QuestionMark, Settings, Trash, X } from "tabler-icons-react";
+import { Check, Loader, QuestionMark, Trash } from "tabler-icons-react";
 import { useDebouncedCallback } from "use-debounce";
-import { ListItem } from "../../../lib/interfaces/list";
 import { ListItemViewModel } from "../../../store/list/ListItemViewModel";
 
 export interface ListItemProps
 {
     model: ListItemViewModel;
-    onUpdate: ( item: ListItem ) => void;
-    onDelete: ( item: ListItem ) => void;
+    onUpdate: ( item: ListItemViewModel ) => void;
+    onDelete: ( item: ListItemViewModel ) => void;
     pressDelay?: number;
 }
 
@@ -111,14 +110,14 @@ export const CheckableItem = observer( ( { model, onUpdate, onDelete, pressDelay
                         size="md"
                         checked={model.checked}
                         onChange={e => e}
-                        label={<Text>{model.text}</Text>}
+                        label={<Text onClick={() => onToggleEdit()}>{model.text}</Text>}
                     />}
             </Box>
-            <IconButton radius={20} color={theme.white} background={theme.colors.blue[ 6 ]} onClick={onToggleEdit}>
+            {/* <IconButton radius={20} color={theme.white} background={theme.colors.blue[ 6 ]} onClick={onToggleEdit}>
                 <Center>
                     {editMode ? <X /> : <Settings />}
                 </Center>
-            </IconButton>
+            </IconButton> */}
         </>
     );
 } );

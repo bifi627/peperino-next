@@ -6,6 +6,7 @@ import { useRouter } from "next/router";
 import { useState } from "react";
 import { Plus } from 'tabler-icons-react';
 import { NewList } from "../../components/ListPage/Dialogs/NewList";
+import { ListItem } from "../../components/ListPage/OverviewList/ListItem";
 import { IconButton } from "../../components/ListPage/_styles";
 import { List } from "../../lib/interfaces/list";
 import ListService from "../../services/listService";
@@ -58,7 +59,7 @@ const Page = ( props: Props ) =>
         setOpenDialog( true );
     }
 
-    const onCreate = async ( newList: List ) =>
+    const createNewList = async ( newList: List ) =>
     {
         try
         {
@@ -89,7 +90,9 @@ const Page = ( props: Props ) =>
                     {
                         return (
                             <Link key={list.slug} href={KnownRoutes.Lists( list.slug )} passHref>
-                                <a>{list.name}</a>
+                                <a style={{ width: "100%" }}>
+                                    <ListItem list={list}></ListItem>
+                                </a>
                             </Link>
                         )
                     } )}
@@ -106,7 +109,7 @@ const Page = ( props: Props ) =>
                     </Center>
                 </IconButton>
             </Box>
-            {openDialog && <NewList onClose={onDialogClose} onCreate={onCreate}></NewList>}
+            {openDialog && <NewList onClose={onDialogClose} onCreate={createNewList}></NewList>}
         </>
     );
 }
