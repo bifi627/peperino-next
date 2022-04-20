@@ -12,10 +12,11 @@ export default class ListService extends BaseService
         super( token );
     }
 
-    public createList( name: string )
+    public createList( list: List )
     {
-        const slug = slugify( name, { lower: true } );
-        return this.post<List, List>( "", { name: name, listItems: [], slug: slug } );
+        const slug = slugify( list.name, { lower: true } );
+        list.slug = slug;
+        return this.post<List, List>( "", list );
     }
 
     public getLists()

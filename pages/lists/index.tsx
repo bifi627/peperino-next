@@ -63,7 +63,7 @@ const Page = ( props: Props ) =>
     {
         try
         {
-            const createdList = await new ListService().createList( newList.name )
+            const createdList = await new ListService().createList( newList )
             notifications.showNotification( { title: "Neu", message: "Neue Liste wurde erstellt", color: "green", autoClose: true } );
             setLists( [ ...lists, createdList ] )
         }

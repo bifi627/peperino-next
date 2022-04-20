@@ -78,7 +78,7 @@ export const OpenTab = observer( ( props: Props ) =>
                     {
                         return (
                             <SortableListItem showDragHandle key={item.id} index={index}>
-                                <CheckableItem model={item} onDelete={() => viewModel.deleteItem( item )} onUpdate={() => viewModel.updateItem( item )} pressDelay={3000}></CheckableItem>
+                                <CheckableItem model={item} onDelete={() => viewModel.deleteItem( item )} onUpdate={() => viewModel.updateItem( item )} pressDelay={200}></CheckableItem>
                             </SortableListItem>
                         );
                     } )}

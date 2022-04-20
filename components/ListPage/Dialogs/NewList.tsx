@@ -1,5 +1,6 @@
 import { Button, Group, Modal, Space, TextInput, useMantineTheme } from "@mantine/core";
 import { useForm } from "@mantine/form";
+import { useUser } from "../../../hooks/useUser";
 import { List } from "../../../lib/interfaces/list";
 
 interface Props
@@ -11,6 +12,7 @@ interface Props
 export const NewList = ( { onCreate, onClose }: Props ) =>
 {
     const theme = useMantineTheme();
+    const user = useUser();
 
     const form = useForm( {
         initialValues: {
@@ -28,7 +30,7 @@ export const NewList = ( { onCreate, onClose }: Props ) =>
 
         if ( !form.validate().hasErrors )
         {
-            onCreate( { name: form.values.name, listItems: [], slug: "" } );
+            onCreate( { name: form.values.name, description: "", ownerName: user?.peperinoUser?.username ?? "", created: new Date().toISOString(), listItems: [], slug: "" } );
         }
     }
 
